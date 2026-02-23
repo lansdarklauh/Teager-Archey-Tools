@@ -1,0 +1,44 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/statistics/index",
+    "pages/timer/index",
+    "pages/mine/index",
+    "pages/score/normal",
+    "pages/score/simple",
+    "pages/score/custom",
+    "pages/score/scoring",
+    "pages/score/detail"
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "射箭助手",
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "backgroundColor": "#F5F5F5"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#00C853",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "计分"
+      },
+      {
+        "pagePath": "pages/statistics/index",
+        "text": "统计"
+      },
+      {
+        "pagePath": "pages/timer/index",
+        "text": "计时"
+      },
+      {
+        "pagePath": "pages/mine/index",
+        "text": "我的"
+      }
+    ]
+  },
+  "usingComponents": {}
+}

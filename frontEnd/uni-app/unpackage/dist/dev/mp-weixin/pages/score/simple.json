@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "简易模式",
+  "usingComponents": {
+    "score-keyboard": "../../components/common/ScoreKeyboard",
+    "popup": "../../components/common/Popup"
+  }
+}

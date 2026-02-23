@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "计时",
+  "usingComponents": {
+    "popup": "../../components/common/Popup"
+  }
+}

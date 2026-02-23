@@ -1,0 +1,93 @@
+{
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "计分"
+      }
+    },
+    {
+      "path": "pages/statistics/index",
+      "style": {
+        "navigationBarTitleText": "统计"
+      }
+    },
+    {
+      "path": "pages/timer/index",
+      "style": {
+        "navigationBarTitleText": "计时"
+      }
+    },
+    {
+      "path": "pages/mine/index",
+      "style": {
+        "navigationBarTitleText": "我的"
+      }
+    },
+    {
+      "path": "pages/score/normal",
+      "style": {
+        "navigationBarTitleText": "普通模式"
+      }
+    },
+    {
+      "path": "pages/score/simple",
+      "style": {
+        "navigationBarTitleText": "简易模式"
+      }
+    },
+    {
+      "path": "pages/score/custom",
+      "style": {
+        "navigationBarTitleText": "自定义模式"
+      }
+    },
+    {
+      "path": "pages/score/scoring",
+      "style": {
+        "navigationBarTitleText": "计分中"
+      }
+    },
+    {
+      "path": "pages/score/detail",
+      "style": {
+        "navigationBarTitleText": "计分详情"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "射箭助手",
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "backgroundColor": "#F5F5F5"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#00C853",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "计分"
+      },
+      {
+        "pagePath": "pages/statistics/index",
+        "text": "统计"
+      },
+      {
+        "pagePath": "pages/timer/index",
+        "text": "计时"
+      },
+      {
+        "pagePath": "pages/mine/index",
+        "text": "我的"
+      }
+    ]
+  },
+  "easycom": {
+    "autoscan": true,
+    "custom": {}
+  },
+  "uniIdRouter": {}
+}

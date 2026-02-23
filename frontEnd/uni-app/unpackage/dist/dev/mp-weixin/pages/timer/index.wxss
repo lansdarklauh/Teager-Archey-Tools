@@ -1,0 +1,341 @@
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.page-container.data-v-706ada7f {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 24rpx;
+  padding-bottom: 120rpx;
+}
+.start-btn.data-v-706ada7f {
+  width: 100%;
+  height: 96rpx;
+  background-color: var(--32cef760);
+  border-radius: 48rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 12rpx var(--6fae1076);
+}
+.start-btn.running.data-v-706ada7f {
+  background-color: #ff9800;
+}
+.start-btn.paused.data-v-706ada7f {
+  background-color: #2196f3;
+}
+.btn-icon.data-v-706ada7f {
+  font-size: 32rpx;
+  color: #fff;
+  margin-right: 12rpx;
+}
+.btn-text.data-v-706ada7f {
+  font-size: 34rpx;
+  color: #fff;
+  font-weight: 500;
+}
+.stage-display.data-v-706ada7f {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+}
+.stage-info.data-v-706ada7f {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+.stage-icon.data-v-706ada7f {
+  font-size: 28rpx;
+  margin-right: 8rpx;
+}
+.stage-label.data-v-706ada7f {
+  font-size: 26rpx;
+  color: #666;
+  margin-right: 12rpx;
+}
+.stage-name.data-v-706ada7f {
+  font-size: 28rpx;
+  color: #00c853;
+  font-weight: 500;
+  margin-right: 16rpx;
+}
+.stage-name.faultTolerance.data-v-706ada7f {
+  color: #ff9800;
+}
+.stage-name.prepare.data-v-706ada7f {
+  color: #2196f3;
+}
+.stage-name.formal.data-v-706ada7f {
+  color: var(--32cef760);
+}
+.stage-name.rest.data-v-706ada7f {
+  color: #9c27b0;
+}
+.stage-time.data-v-706ada7f {
+  font-size: 24rpx;
+  color: #999;
+}
+.progress-bar.data-v-706ada7f {
+  height: 16rpx;
+  background-color: #e0e0e0;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+.progress-fill.data-v-706ada7f {
+  height: 100%;
+  background-color: var(--32cef760);
+  transition: width 0.3s;
+}
+.config-section.data-v-706ada7f {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+}
+.section-label.data-v-706ada7f {
+  font-size: 26rpx;
+  color: #999;
+  margin-bottom: 16rpx;
+  display: block;
+}
+.preset-select.data-v-706ada7f {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 24rpx;
+  border: 2rpx solid #ddd;
+  border-radius: 12rpx;
+}
+.preset-name.data-v-706ada7f {
+  font-size: 28rpx;
+  color: #333;
+}
+.select-icon.data-v-706ada7f {
+  font-size: 24rpx;
+  color: #999;
+}
+.section-header.data-v-706ada7f {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+.section-icon.data-v-706ada7f {
+  font-size: 28rpx;
+  margin-right: 12rpx;
+}
+.section-title.data-v-706ada7f {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+}
+.time-inputs.data-v-706ada7f {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+.input-row.data-v-706ada7f {
+  display: flex;
+  gap: 24rpx;
+}
+.input-group.data-v-706ada7f {
+  flex: 1;
+}
+.input-group.full.data-v-706ada7f {
+  flex: none;
+  width: 100%;
+}
+.input-label.data-v-706ada7f {
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 12rpx;
+  display: block;
+}
+.input-label.required.data-v-706ada7f::after {
+  content: "*";
+  color: #ff5252;
+  margin-left: 4rpx;
+}
+.input-field.data-v-706ada7f {
+  height: 80rpx;
+  padding: 0 20rpx;
+  background-color: #f5f5f5;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+}
+.input-field.highlight.data-v-706ada7f {
+  background-color: rgba(0, 200, 83, 0.1);
+  border: 2rpx solid #00c853;
+}
+.cycle-toggle.data-v-706ada7f {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.toggle-label.data-v-706ada7f {
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 8rpx;
+}
+.sound-settings.data-v-706ada7f {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+.sound-type.data-v-706ada7f {
+  display: flex;
+  align-items: center;
+}
+.sound-label.data-v-706ada7f {
+  font-size: 26rpx;
+  color: #666;
+  margin-right: 16rpx;
+}
+.type-options.data-v-706ada7f {
+  display: flex;
+  gap: 16rpx;
+}
+.type-option.data-v-706ada7f {
+  padding: 12rpx 32rpx;
+  border: 2rpx solid #ddd;
+  border-radius: 32rpx;
+}
+.type-option.active.data-v-706ada7f {
+  border-color: var(--32cef760);
+  background-color: var(--6fae27b6);
+}
+.type-option.active text.data-v-706ada7f {
+  color: var(--32cef760);
+}
+.type-option text.data-v-706ada7f {
+  font-size: 26rpx;
+  color: #666;
+}
+.points-list.data-v-706ada7f {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 12rpx;
+}
+.point-tag.data-v-706ada7f {
+  display: flex;
+  align-items: center;
+  padding: 8rpx 16rpx;
+  background-color: #f0f0f0;
+  border-radius: 20rpx;
+}
+.point-tag text.data-v-706ada7f {
+  font-size: 24rpx;
+  color: #666;
+}
+.remove-point.data-v-706ada7f {
+  margin-left: 8rpx;
+  color: #ff5252 !important;
+}
+.add-point.data-v-706ada7f {
+  padding: 8rpx 16rpx;
+  border: 2rpx dashed var(--32cef760);
+  border-radius: 20rpx;
+}
+.add-point text.data-v-706ada7f {
+  font-size: 24rpx;
+  color: var(--32cef760);
+}
+.control-buttons.data-v-706ada7f {
+  display: flex;
+  gap: 24rpx;
+  margin-top: 24rpx;
+}
+.ctrl-btn.data-v-706ada7f {
+  flex: 1;
+  height: 80rpx;
+  border-radius: 40rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.ctrl-btn text.data-v-706ada7f {
+  font-size: 28rpx;
+}
+.btn-reset.data-v-706ada7f {
+  background-color: #fff;
+  border: 2rpx solid var(--32cef760);
+}
+.btn-reset text.data-v-706ada7f {
+  color: var(--32cef760);
+}
+.btn-stop.data-v-706ada7f {
+  background-color: #ff5252;
+}
+.btn-stop text.data-v-706ada7f {
+  color: #fff;
+}
+.preset-list.data-v-706ada7f {
+  max-height: 500rpx;
+  overflow-y: auto;
+}
+.preset-item.data-v-706ada7f {
+  padding: 24rpx;
+  border-bottom: 1px solid #f0f0f0;
+}
+.preset-item.active.data-v-706ada7f {
+  background-color: var(--6fae27b6);
+}
+.preset-item.data-v-706ada7f:last-child {
+  border-bottom: none;
+}
+.preset-info.data-v-706ada7f {
+  display: flex;
+  flex-direction: column;
+}
+.preset-name.data-v-706ada7f {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+.preset-desc.data-v-706ada7f {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 8rpx;
+}
+.add-point-form.data-v-706ada7f {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 0;
+}
+.point-input.data-v-706ada7f {
+  flex: 1;
+  height: 80rpx;
+  padding: 0 24rpx;
+  border: 2rpx solid #ddd;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+}
+.point-unit.data-v-706ada7f {
+  font-size: 26rpx;
+  color: #666;
+  margin-left: 12rpx;
+}

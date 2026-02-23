@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "计分",
+  "usingComponents": {
+    "popup": "../../components/common/Popup",
+    "mode-selector": "../../components/business/ModeSelector",
+    "filter-panel": "../../components/business/FilterPanel",
+    "score-record-card": "../../components/business/ScoreRecordCard"
+  }
+}

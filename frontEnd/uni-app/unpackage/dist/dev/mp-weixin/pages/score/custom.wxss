@@ -1,0 +1,294 @@
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.page-container.data-v-4a27225b {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 24rpx;
+  padding-bottom: 300rpx;
+}
+.config-section.data-v-4a27225b {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+}
+.section-title.data-v-4a27225b {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 24rpx;
+}
+.option-tags.data-v-4a27225b {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-bottom: 16rpx;
+}
+.option-tag.data-v-4a27225b {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 24rpx;
+  border: 2rpx solid #ddd;
+  border-radius: 40rpx;
+}
+.tag-icon.data-v-4a27225b {
+  font-size: 28rpx;
+  margin-right: 8rpx;
+}
+.tag-text.data-v-4a27225b {
+  font-size: 26rpx;
+  color: #333;
+}
+.group-info.data-v-4a27225b {
+  padding: 16rpx;
+  background-color: #f9f9f9;
+  border-radius: 8rpx;
+}
+.group-info text.data-v-4a27225b {
+  font-size: 26rpx;
+  color: #666;
+}
+.switch-row.data-v-4a27225b {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.switch-label.data-v-4a27225b {
+  font-size: 28rpx;
+  color: #333;
+}
+.timing-row.data-v-4a27225b {
+  display: flex;
+  gap: 32rpx;
+  padding-top: 24rpx;
+}
+.timing-input.data-v-4a27225b {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+.timing-label.data-v-4a27225b {
+  font-size: 26rpx;
+  color: #666;
+  white-space: nowrap;
+}
+.timing-field.data-v-4a27225b {
+  width: 100rpx;
+  height: 60rpx;
+  border-bottom: 2rpx solid #ddd;
+  text-align: center;
+  font-size: 28rpx;
+  margin: 0 8rpx;
+}
+.timing-unit.data-v-4a27225b {
+  font-size: 26rpx;
+  color: #999;
+}
+.target-type-tabs.data-v-4a27225b {
+  display: flex;
+  margin-bottom: 24rpx;
+}
+.tab-item.data-v-4a27225b {
+  flex: 1;
+  height: 72rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2rpx solid #ddd;
+  background-color: #fff;
+}
+.tab-item.data-v-4a27225b:first-child {
+  border-radius: 36rpx 0 0 36rpx;
+}
+.tab-item.data-v-4a27225b:last-child {
+  border-radius: 0 36rpx 36rpx 0;
+}
+.tab-item.active.data-v-4a27225b {
+  background-color: var(--71ff7ee2);
+  border-color: var(--71ff7ee2);
+}
+.tab-item.active text.data-v-4a27225b {
+  color: #fff;
+}
+.tab-item text.data-v-4a27225b {
+  font-size: 28rpx;
+  color: #666;
+}
+.target-row.data-v-4a27225b {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+.target-label.data-v-4a27225b {
+  font-size: 26rpx;
+  color: #666;
+  width: 140rpx;
+}
+.target-select.data-v-4a27225b {
+  flex: 1;
+  height: 64rpx;
+  padding: 0 20rpx;
+  border: 2rpx solid #ddd;
+  border-radius: 8rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.target-select text.data-v-4a27225b {
+  font-size: 26rpx;
+  color: #333;
+}
+.select-icon.data-v-4a27225b {
+  font-size: 20rpx;
+  color: #999;
+}
+.target-input.data-v-4a27225b {
+  flex: 1;
+  height: 64rpx;
+  padding: 0 20rpx;
+  border: 2rpx solid #ddd;
+  border-radius: 8rpx;
+  font-size: 26rpx;
+}
+.add-target-btn.data-v-4a27225b {
+  height: 80rpx;
+  border: 2rpx dashed var(--71ff7ee2);
+  border-radius: 12rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 16rpx;
+}
+.add-target-btn text.data-v-4a27225b {
+  font-size: 28rpx;
+  color: var(--71ff7ee2);
+}
+.view-detail-btn.data-v-4a27225b {
+  margin-top: 16rpx;
+}
+.view-detail-btn text.data-v-4a27225b {
+  font-size: 26rpx;
+  color: #00c853;
+}
+.action-buttons.data-v-4a27225b {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  margin-top: 24rpx;
+}
+.btn.data-v-4a27225b {
+  height: 88rpx;
+  border-radius: 44rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.btn text.data-v-4a27225b {
+  font-size: 30rpx;
+}
+.btn-primary.data-v-4a27225b {
+  background-color: var(--71ff7ee2);
+}
+.btn-primary text.data-v-4a27225b {
+  color: #fff;
+}
+.btn-outline.data-v-4a27225b {
+  background-color: #fff;
+  border: 2rpx solid var(--71ff7ee2);
+}
+.btn-outline text.data-v-4a27225b {
+  color: var(--71ff7ee2);
+}
+.picker-options.data-v-4a27225b {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  padding: 16rpx 0;
+}
+.picker-option.data-v-4a27225b {
+  padding: 20rpx 32rpx;
+  border: 2rpx solid #ddd;
+  border-radius: 8rpx;
+}
+.picker-option.active.data-v-4a27225b {
+  border-color: #00c853;
+  background-color: rgba(0, 200, 83, 0.1);
+}
+.picker-option.active text.data-v-4a27225b {
+  color: #00c853;
+}
+.picker-option text.data-v-4a27225b {
+  font-size: 28rpx;
+  color: #333;
+}
+.preset-list.data-v-4a27225b {
+  max-height: 500rpx;
+  overflow-y: auto;
+}
+.preset-item.data-v-4a27225b {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.preset-info.data-v-4a27225b {
+  flex: 1;
+}
+.preset-name.data-v-4a27225b {
+  font-size: 28rpx;
+  color: #333;
+  display: block;
+}
+.preset-desc.data-v-4a27225b {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 8rpx;
+}
+.preset-delete text.data-v-4a27225b {
+  font-size: 26rpx;
+  color: #ff5252;
+}
+.empty-preset.data-v-4a27225b {
+  padding: 48rpx 0;
+  text-align: center;
+}
+.empty-preset text.data-v-4a27225b {
+  font-size: 28rpx;
+  color: #999;
+}
+.preset-form.data-v-4a27225b {
+  padding: 16rpx 0;
+}
+.preset-name-input.data-v-4a27225b {
+  height: 80rpx;
+  padding: 0 24rpx;
+  border: 2rpx solid #ddd;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+}

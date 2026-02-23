@@ -1,0 +1,300 @@
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.page-container.data-v-04d39506 {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding-bottom: 300rpx;
+}
+.info-bar.data-v-04d39506 {
+  display: flex;
+  justify-content: space-between;
+  padding: 24rpx;
+  background-color: #fff;
+  border-bottom: 1px solid #f0f0f0;
+}
+.info-item.data-v-04d39506 {
+  display: flex;
+  align-items: center;
+}
+.info-icon.data-v-04d39506 {
+  font-size: 28rpx;
+  margin-right: 8rpx;
+}
+.info-text.data-v-04d39506 {
+  font-size: 26rpx;
+  color: #333;
+}
+.sub-info-bar.data-v-04d39506 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 24rpx;
+  background-color: #fff;
+}
+.sub-info.data-v-04d39506 {
+  display: flex;
+  align-items: center;
+}
+.score-mode.data-v-04d39506 {
+  font-size: 26rpx;
+  color: #00c853;
+  font-weight: 500;
+}
+.settings-btn text.data-v-04d39506 {
+  font-size: 26rpx;
+  color: #666;
+}
+.swiper-indicator.data-v-04d39506 {
+  display: flex;
+  justify-content: center;
+  padding: 16rpx 0;
+  background-color: #fff;
+}
+.indicator-dot.data-v-04d39506 {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background-color: #ddd;
+  margin: 0 8rpx;
+}
+.indicator-dot.active.data-v-04d39506 {
+  background-color: #00c853;
+  width: 32rpx;
+  border-radius: 8rpx;
+}
+.timing-display.data-v-04d39506 {
+  padding: 24rpx;
+  background-color: #fff;
+  margin-top: 16rpx;
+}
+.timing-text.data-v-04d39506 {
+  font-size: 28rpx;
+  color: #333;
+  display: block;
+  margin-bottom: 16rpx;
+}
+.timing-progress.data-v-04d39506 {
+  height: 16rpx;
+  background-color: #e0e0e0;
+  border-radius: 8rpx;
+  overflow: hidden;
+  margin-bottom: 16rpx;
+}
+.progress-bar.data-v-04d39506 {
+  height: 100%;
+  background-color: #00c853;
+  transition: width 0.3s;
+}
+.timing-controls.data-v-04d39506 {
+  display: flex;
+  justify-content: center;
+  gap: 24rpx;
+}
+.control-btn.data-v-04d39506 {
+  padding: 12rpx 48rpx;
+  background-color: #00c853;
+  border-radius: 32rpx;
+}
+.control-btn text.data-v-04d39506 {
+  font-size: 26rpx;
+  color: #fff;
+}
+.control-btn.btn-pause.data-v-04d39506 {
+  background-color: #ff9800;
+}
+.score-area.data-v-04d39506 {
+  margin: 16rpx 24rpx;
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+}
+.score-header.data-v-04d39506 {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 1px solid #f0f0f0;
+}
+.group-title.data-v-04d39506 {
+  font-size: 30rpx;
+  color: #00c853;
+  font-weight: 500;
+}
+.accumulate-score.data-v-04d39506 {
+  font-size: 30rpx;
+  color: #00c853;
+  font-weight: 500;
+}
+.score-grid.data-v-04d39506 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24rpx;
+}
+.score-cell.data-v-04d39506 {
+  display: flex;
+  align-items: center;
+}
+.cell-index.data-v-04d39506 {
+  font-size: 24rpx;
+  color: #999;
+  margin-right: 8rpx;
+  width: 40rpx;
+}
+.cell-value.data-v-04d39506 {
+  flex: 1;
+  height: 70rpx;
+  border: 2rpx solid #ddd;
+  border-radius: 8rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+}
+.cell-value.active.data-v-04d39506 {
+  border-color: #00c853;
+  box-shadow: 0 0 0 2rpx rgba(0, 200, 83, 0.2);
+}
+.cell-value text.data-v-04d39506 {
+  font-size: 32rpx;
+  font-weight: 500;
+}
+.score-gold.data-v-04d39506 {
+  background-color: #ffd700 !important;
+}
+.score-gold text.data-v-04d39506 {
+  color: #333;
+}
+.score-red.data-v-04d39506 {
+  background-color: #ff0000 !important;
+}
+.score-red text.data-v-04d39506 {
+  color: #fff;
+}
+.score-blue.data-v-04d39506 {
+  background-color: #2196f3 !important;
+}
+.score-blue text.data-v-04d39506 {
+  color: #fff;
+}
+.score-miss.data-v-04d39506 {
+  background-color: #ccc !important;
+}
+.score-miss text.data-v-04d39506 {
+  color: #fff;
+}
+.score-default.data-v-04d39506 {
+  background-color: #f9f9f9 !important;
+}
+.score-default text.data-v-04d39506 {
+  color: #333;
+}
+.photo-area.data-v-04d39506 {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 24rpx;
+  padding-top: 24rpx;
+  border-top: 1px solid #f0f0f0;
+}
+.photo-item.data-v-04d39506 {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+.photo-item image.data-v-04d39506 {
+  width: 100%;
+  height: 100%;
+}
+.photo-add.data-v-04d39506 {
+  width: 100%;
+  height: 100%;
+  background-color: #f5f5f5;
+  border: 2rpx dashed #ddd;
+  border-radius: 8rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.photo-add text.data-v-04d39506 {
+  font-size: 48rpx;
+  color: #ccc;
+}
+.action-buttons.data-v-04d39506 {
+  display: flex;
+  gap: 24rpx;
+  padding: 24rpx;
+  position: fixed;
+  bottom: 220rpx;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+}
+.btn.data-v-04d39506 {
+  flex: 1;
+  height: 88rpx;
+  border-radius: 44rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.btn text.data-v-04d39506 {
+  font-size: 30rpx;
+}
+.btn-cancel.data-v-04d39506 {
+  background-color: #fff;
+  border: 2rpx solid #ff5252;
+}
+.btn-cancel text.data-v-04d39506 {
+  color: #ff5252;
+}
+.btn-save.data-v-04d39506 {
+  background-color: #00c853;
+}
+.btn-save text.data-v-04d39506 {
+  color: #fff;
+}
+.nav-buttons.data-v-04d39506 {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 24rpx;
+  margin-top: 16rpx;
+}
+.nav-btn.data-v-04d39506 {
+  padding: 16rpx 48rpx;
+  border: 2rpx solid #00c853;
+  border-radius: 32rpx;
+}
+.nav-btn text.data-v-04d39506 {
+  font-size: 26rpx;
+  color: #00c853;
+}
+.photo-prompt.data-v-04d39506 {
+  padding: 24rpx 0;
+}
+.photo-prompt text.data-v-04d39506 {
+  font-size: 28rpx;
+  color: #666;
+}

@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "普通模式",
+  "usingComponents": {
+    "popup": "../../components/common/Popup",
+    "group-picker": "../../components/business/GroupPicker"
+  }
+}

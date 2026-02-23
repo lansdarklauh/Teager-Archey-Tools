@@ -1,0 +1,182 @@
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.page-container.data-v-d99e6cfb {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 24rpx;
+}
+.config-section.data-v-d99e6cfb {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+}
+.section-title.data-v-d99e6cfb {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 24rpx;
+}
+.option-row.data-v-d99e6cfb {
+  margin-bottom: 16rpx;
+}
+.option-tags.data-v-d99e6cfb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+.option-tag.data-v-d99e6cfb {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 24rpx;
+  border: 2rpx solid #ddd;
+  border-radius: 40rpx;
+  background-color: #fff;
+}
+.option-tag.active.data-v-d99e6cfb, .option-tag.data-v-d99e6cfb:active {
+  border-color: var(--0073a94c);
+  background-color: var(--15282787);
+}
+.tag-icon.data-v-d99e6cfb {
+  font-size: 28rpx;
+  margin-right: 8rpx;
+}
+.tag-text.data-v-d99e6cfb {
+  font-size: 26rpx;
+  color: #333;
+}
+.group-info.data-v-d99e6cfb {
+  padding: 16rpx;
+  background-color: #f9f9f9;
+  border-radius: 8rpx;
+}
+.group-info text.data-v-d99e6cfb {
+  font-size: 26rpx;
+  color: #666;
+}
+.switch-row.data-v-d99e6cfb {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.switch-row.data-v-d99e6cfb:last-child {
+  border-bottom: none;
+}
+.switch-label.data-v-d99e6cfb {
+  font-size: 28rpx;
+  color: #333;
+}
+.timing-row.data-v-d99e6cfb {
+  display: flex;
+  gap: 32rpx;
+  padding-top: 24rpx;
+}
+.timing-input.data-v-d99e6cfb {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+.timing-label.data-v-d99e6cfb {
+  font-size: 26rpx;
+  color: #666;
+  white-space: nowrap;
+}
+.timing-field.data-v-d99e6cfb {
+  width: 100rpx;
+  height: 60rpx;
+  border-bottom: 2rpx solid #ddd;
+  text-align: center;
+  font-size: 28rpx;
+  margin: 0 8rpx;
+}
+.timing-unit.data-v-d99e6cfb {
+  font-size: 26rpx;
+  color: #999;
+}
+.start-btn.data-v-d99e6cfb {
+  width: 100%;
+  height: 96rpx;
+  background-color: var(--0073a94c);
+  border-radius: 48rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 48rpx;
+  box-shadow: 0 4rpx 12rpx var(--1528368b);
+}
+.start-btn text.data-v-d99e6cfb {
+  font-size: 34rpx;
+  color: #fff;
+  font-weight: 500;
+}
+.picker-options.data-v-d99e6cfb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  padding: 16rpx 0;
+}
+.target-grid.data-v-d99e6cfb {
+  max-height: 400rpx;
+  overflow-y: auto;
+}
+.picker-option.data-v-d99e6cfb {
+  padding: 20rpx 32rpx;
+  border: 2rpx solid #ddd;
+  border-radius: 8rpx;
+}
+.picker-option.active.data-v-d99e6cfb {
+  border-color: #00c853;
+  background-color: rgba(0, 200, 83, 0.1);
+}
+.picker-option.active text.data-v-d99e6cfb {
+  color: #00c853;
+}
+.picker-option text.data-v-d99e6cfb {
+  font-size: 28rpx;
+  color: #333;
+}
+.custom-input-row.data-v-d99e6cfb {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 0;
+  margin-top: 16rpx;
+  border-top: 1px solid #f0f0f0;
+}
+.custom-input.data-v-d99e6cfb {
+  flex: 1;
+  height: 64rpx;
+  padding: 0 16rpx;
+  border: 2rpx solid #ddd;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+}
+.custom-unit.data-v-d99e6cfb {
+  font-size: 26rpx;
+  color: #999;
+  margin-left: 12rpx;
+}

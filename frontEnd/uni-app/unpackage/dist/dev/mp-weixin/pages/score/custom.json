@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "自定义模式",
+  "usingComponents": {
+    "popup": "../../components/common/Popup",
+    "group-picker": "../../components/business/GroupPicker",
+    "target-config-item": "../../components/business/TargetConfigItem"
+  }
+}
