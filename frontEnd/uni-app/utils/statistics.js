@@ -1,20 +1,22 @@
 /**
  * 统计分析工具函数
  */
+import { getTodayStart, getWeekStart, getMonthStart } from '@/utils/date.js'
+import { round2 } from '@/utils/number.js'
 
 /**
- * 计算平均分
+ * 计算平均分（保留2位小数，避免浮点精度问题）
  * @param {Array} scores - 分数数组
  * @returns {number} - 平均分
  */
 export const calculateAverage = (scores) => {
     if (!scores || scores.length === 0) return 0
     const sum = scores.reduce((a, b) => a + b, 0)
-    return Number((sum / scores.length).toFixed(2))
+    return round2(sum / scores.length)
 }
 
 /**
- * 计算中位数
+ * 计算中位数（保留2位小数）
  * @param {Array} scores - 分数数组
  * @returns {number} - 中位数
  */
@@ -23,13 +25,13 @@ export const calculateMedian = (scores) => {
     const sorted = [...scores].sort((a, b) => a - b)
     const mid = Math.floor(sorted.length / 2)
     if (sorted.length % 2 === 0) {
-        return Number(((sorted[mid - 1] + sorted[mid]) / 2).toFixed(2))
+        return round2((sorted[mid - 1] + sorted[mid]) / 2)
     }
-    return sorted[mid]
+    return round2(sorted[mid])
 }
 
 /**
- * 计算众数
+ * 计算众数（保留2位小数）
  * @param {Array} scores - 分数数组
  * @returns {number} - 众数
  */
@@ -179,7 +181,7 @@ export const calculateStatistics = (records) => {
         maxScore: Math.max(...scores),
         minScore: Math.min(...scores),
         totalArrows,
-        arrowAvg: totalArrows > 0 ? Number((totalScore / totalArrows).toFixed(2)) : 0,
+        arrowAvg: totalArrows > 0 ? round2(totalScore / totalArrows) : 0,
         xTotal,
         tenTotal,
         ringDistribution
@@ -233,7 +235,7 @@ export const generateRingDistribution = (record) => {
 }
 
 /**
- * 获取时间范围内的记录
+ * 获取时间范围内的记录 - 使用 dayjs 处理时间
  * @param {Array} records - 记录列表
  * @param {string} timeRange - 时间范围 today/week/month/all
  * @returns {Array} - 筛选后的记录
@@ -242,18 +244,17 @@ export const getRecordsByTimeRange = (records, timeRange) => {
     if (!records || records.length === 0) return []
     if (timeRange === 'all') return records
 
-    const now = new Date()
     let startTime
 
     switch (timeRange) {
         case 'today':
-            startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
+            startTime = getTodayStart()
             break
         case 'week':
-            startTime = now.getTime() - 7 * 24 * 60 * 60 * 1000
+            startTime = getWeekStart()
             break
         case 'month':
-            startTime = now.getTime() - 30 * 24 * 60 * 60 * 1000
+            startTime = getMonthStart()
             break
         default:
             return records

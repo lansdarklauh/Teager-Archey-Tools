@@ -12,7 +12,7 @@ const FilterPanel = () => "../../components/business/FilterPanel.js";
 const ScoreRecordCard = () => "../../components/business/ScoreRecordCard.js";
 const _sfc_main = {
   __name: "index",
-  setup(__props, { expose: __expose }) {
+  setup(__props) {
     common_vendor.useCssVars((_ctx) => ({
       "be3a4cb0": themeColor.value,
       "20b11706": themeColor.value + "4D",
@@ -79,11 +79,8 @@ const _sfc_main = {
         themeColor.value = color;
       });
     });
-    const onPageShow = () => {
+    common_vendor.onShow(() => {
       loadRecords();
-    };
-    __expose({
-      onShow: onPageShow
     });
     return (_ctx, _cache) => {
       return common_vendor.e({

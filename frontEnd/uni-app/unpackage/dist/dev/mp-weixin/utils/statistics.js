@@ -1,9 +1,11 @@
 "use strict";
+const utils_date = require("./date.js");
+const utils_number = require("./number.js");
 const calculateAverage = (scores) => {
   if (!scores || scores.length === 0)
     return 0;
   const sum = scores.reduce((a, b) => a + b, 0);
-  return Number((sum / scores.length).toFixed(2));
+  return utils_number.round2(sum / scores.length);
 };
 const calculateMedian = (scores) => {
   if (!scores || scores.length === 0)
@@ -11,9 +13,9 @@ const calculateMedian = (scores) => {
   const sorted = [...scores].sort((a, b) => a - b);
   const mid = Math.floor(sorted.length / 2);
   if (sorted.length % 2 === 0) {
-    return Number(((sorted[mid - 1] + sorted[mid]) / 2).toFixed(2));
+    return utils_number.round2((sorted[mid - 1] + sorted[mid]) / 2);
   }
-  return sorted[mid];
+  return utils_number.round2(sorted[mid]);
 };
 const calculateMode = (scores) => {
   if (!scores || scores.length === 0)
@@ -137,7 +139,7 @@ const calculateStatistics = (records) => {
     maxScore: Math.max(...scores),
     minScore: Math.min(...scores),
     totalArrows,
-    arrowAvg: totalArrows > 0 ? Number((totalScore / totalArrows).toFixed(2)) : 0,
+    arrowAvg: totalArrows > 0 ? utils_number.round2(totalScore / totalArrows) : 0,
     xTotal,
     tenTotal,
     ringDistribution
@@ -180,17 +182,16 @@ const getRecordsByTimeRange = (records, timeRange) => {
     return [];
   if (timeRange === "all")
     return records;
-  const now = /* @__PURE__ */ new Date();
   let startTime;
   switch (timeRange) {
     case "today":
-      startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+      startTime = utils_date.getTodayStart();
       break;
     case "week":
-      startTime = now.getTime() - 7 * 24 * 60 * 60 * 1e3;
+      startTime = utils_date.getWeekStart();
       break;
     case "month":
-      startTime = now.getTime() - 30 * 24 * 60 * 60 * 1e3;
+      startTime = utils_date.getMonthStart();
       break;
     default:
       return records;

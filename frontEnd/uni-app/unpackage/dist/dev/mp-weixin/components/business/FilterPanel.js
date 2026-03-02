@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const utils_theme = require("../../utils/theme.js");
+const utils_date = require("../../utils/date.js");
 const _sfc_main = {
   __name: "FilterPanel",
   props: {
@@ -31,8 +32,22 @@ const _sfc_main = {
     const toggleScoreFilter = () => {
       enableScoreFilter.value = !enableScoreFilter.value;
     };
-    const pickDate = (type) => {
-      common_vendor.index.showToast({ title: "请选择日期", icon: "none" });
+    const datePickerStart = common_vendor.computed(() => {
+      const d = /* @__PURE__ */ new Date();
+      d.setFullYear(d.getFullYear() - 1);
+      return utils_date.formatDate(d.getTime(), "YYYY-MM-DD");
+    });
+    const datePickerEnd = common_vendor.computed(() => {
+      return utils_date.formatDate(Date.now(), "YYYY-MM-DD");
+    });
+    const onDateChange = (type, e) => {
+      var _a;
+      const val = ((_a = e.detail) == null ? void 0 : _a.value) || e;
+      if (type === "start") {
+        startDate.value = val;
+      } else {
+        endDate.value = val;
+      }
     };
     const onMinMove = (e) => {
     };
@@ -52,13 +67,13 @@ const _sfc_main = {
       const filter = {};
       if (enableTimeFilter.value) {
         if (timeType.value === "single" && startDate.value) {
-          filter.startTime = new Date(startDate.value).getTime();
+          filter.startTime = utils_date.parseToTimestamp(startDate.value);
           filter.endTime = filter.startTime + 24 * 60 * 60 * 1e3;
         } else if (timeType.value === "range") {
           if (startDate.value)
-            filter.startTime = new Date(startDate.value).getTime();
+            filter.startTime = utils_date.parseToTimestamp(startDate.value);
           if (endDate.value)
-            filter.endTime = new Date(endDate.value).getTime() + 24 * 60 * 60 * 1e3;
+            filter.endTime = utils_date.parseToTimestamp(endDate.value) + 24 * 60 * 60 * 1e3;
         }
       }
       if (enableScoreFilter.value) {
@@ -85,33 +100,42 @@ const _sfc_main = {
       }, enableTimeFilter.value ? common_vendor.e({
         j: timeType.value === "single"
       }, timeType.value === "single" ? {
-        k: common_vendor.t(startDate.value || "选择时间"),
-        l: common_vendor.o(($event) => pickDate())
+        k: common_vendor.t(startDate.value || "选择日期"),
+        l: startDate.value,
+        m: datePickerStart.value,
+        n: datePickerEnd.value,
+        o: common_vendor.o(($event) => onDateChange("start", $event))
       } : {
-        m: common_vendor.t(startDate.value || "开始日期"),
-        n: common_vendor.o(($event) => pickDate()),
-        o: common_vendor.t(endDate.value || "结束日期"),
-        p: common_vendor.o(($event) => pickDate())
+        p: common_vendor.t(startDate.value || "开始日期"),
+        q: startDate.value,
+        r: datePickerStart.value,
+        s: endDate.value || datePickerEnd.value,
+        t: common_vendor.o(($event) => onDateChange("start", $event)),
+        v: common_vendor.t(endDate.value || "结束日期"),
+        w: endDate.value,
+        x: startDate.value || datePickerStart.value,
+        y: datePickerEnd.value,
+        z: common_vendor.o(($event) => onDateChange("end", $event))
       }) : {}, {
-        q: enableScoreFilter.value
+        A: enableScoreFilter.value
       }, enableScoreFilter.value ? {} : {}, {
-        r: enableScoreFilter.value ? 1 : "",
-        s: common_vendor.o(toggleScoreFilter),
-        t: enableScoreFilter.value
+        B: enableScoreFilter.value ? 1 : "",
+        C: common_vendor.o(toggleScoreFilter),
+        D: enableScoreFilter.value
       }, enableScoreFilter.value ? {
-        v: minPercent.value + "%",
-        w: maxPercent.value - minPercent.value + "%",
-        x: minPercent.value + "%",
-        y: common_vendor.o(onMinMove),
-        z: common_vendor.t(scoreMax.value),
-        A: maxPercent.value + "%",
-        B: common_vendor.o(onMaxMove),
-        C: common_vendor.t(scoreMin.value),
-        D: common_vendor.t(scoreMax.value)
+        E: minPercent.value + "%",
+        F: maxPercent.value - minPercent.value + "%",
+        G: minPercent.value + "%",
+        H: common_vendor.o(onMinMove),
+        I: common_vendor.t(scoreMax.value),
+        J: maxPercent.value + "%",
+        K: common_vendor.o(onMaxMove),
+        L: common_vendor.t(scoreMin.value),
+        M: common_vendor.t(scoreMax.value)
       } : {}, {
-        E: common_vendor.o(onReset),
-        F: common_vendor.o(onApply),
-        G: common_vendor.s(_ctx.__cssVars())
+        N: common_vendor.o(onReset),
+        O: common_vendor.o(onApply),
+        P: common_vendor.s(_ctx.__cssVars())
       });
     };
   }

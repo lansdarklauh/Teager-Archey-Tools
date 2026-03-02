@@ -1,4 +1,6 @@
 "use strict";
+require("./date.js");
+const utils_number = require("./number.js");
 const generateId = () => {
   return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
 };
@@ -97,7 +99,7 @@ const updateGroupScoreData = (groupScore, arrowScores, is11Score, accumulateScor
 const calculateArrowAverage = (totalScore, totalArrowNum) => {
   if (totalArrowNum === 0)
     return "0.00";
-  return (totalScore / totalArrowNum).toFixed(2);
+  return utils_number.round2(totalScore / totalArrowNum).toFixed(2);
 };
 const getBowTypeName = (bowType) => {
   const bowTypes = {
@@ -124,26 +126,32 @@ const getTargetTypeName = (targetType) => {
   };
   return targetTypes[targetType] || targetType;
 };
-const formatTime = (timestamp) => {
-  const date = new Date(timestamp);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const hour = String(date.getHours()).padStart(2, "0");
-  const minute = String(date.getMinutes()).padStart(2, "0");
-  return `${year}/${month}/${day} ${hour}:${minute}`;
+const getFirstUnfilledArrowIndex = (arrowScores) => {
+  const index = arrowScores.findIndex(
+    (score) => score === "" || score === null || score === void 0
+  );
+  return index >= 0 ? index : -1;
 };
-const isAllScoresFilled = (arrowScores) => {
-  return arrowScores.every((score) => score !== "" && score !== null && score !== void 0);
+const getFirstUnfilledScoreLocation = (groupScoreList) => {
+  for (let g = 0; g < groupScoreList.length; g++) {
+    const arrowScoreList = groupScoreList[g].arrowScoreList || [];
+    for (let a = 0; a < arrowScoreList.length; a++) {
+      const score = arrowScoreList[a];
+      if (score === "" || score === null || score === void 0) {
+        return { groupIndex: g, arrowIndex: a };
+      }
+    }
+  }
+  return null;
 };
 exports.calculateArrowAverage = calculateArrowAverage;
 exports.calculateGroupScore = calculateGroupScore;
 exports.createEmptyGroupScore = createEmptyGroupScore;
 exports.createScoreRecord = createScoreRecord;
-exports.formatTime = formatTime;
 exports.generateId = generateId;
 exports.getBowTypeName = getBowTypeName;
+exports.getFirstUnfilledArrowIndex = getFirstUnfilledArrowIndex;
+exports.getFirstUnfilledScoreLocation = getFirstUnfilledScoreLocation;
 exports.getTargetTypeName = getTargetTypeName;
-exports.isAllScoresFilled = isAllScoresFilled;
 exports.updateGroupScoreData = updateGroupScoreData;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/utils/score.js.map

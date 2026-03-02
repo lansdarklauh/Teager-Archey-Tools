@@ -119,6 +119,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
+import { onShow } from "@dcloudio/uni-app";
 import { getScoreRecords } from "@/utils/storage.js";
 import { filterRecords, sortRecords } from "@/utils/statistics.js";
 import { getThemeColor } from "@/utils/theme.js";
@@ -214,7 +215,7 @@ const onSortConfirm = () => {
   showSortPanel.value = false;
 };
 
-// 页面显示时刷新数据
+// 初次加载
 onMounted(() => {
   loadRecords();
   // 监听主题色变化
@@ -223,14 +224,9 @@ onMounted(() => {
   });
 });
 
-// 页面显示事件
-const onPageShow = () => {
+// 每次进入页面时刷新列表（如计分完成后返回）
+onShow(() => {
   loadRecords();
-};
-
-// 暴露给页面生命周期
-defineExpose({
-  onShow: onPageShow,
 });
 </script>
 

@@ -38,6 +38,7 @@
     <!-- 分数区域 -->
     <scroll-view
       class="score-sections"
+      :class="{ 'keyboard-active': showKeyboard }"
       scroll-y
       :scroll-into-view="scrollToView"
     >
@@ -116,8 +117,11 @@
       <view class="btn btn-cancel" @click="onCancel">
         <text>放弃计分</text>
       </view>
-      <view class="btn btn-add" @click="addGroupManual">
-        <text>增加一组</text>
+      <view
+        class="btn btn-add"
+        @click="handleAddOrSave"
+      >
+        <text>{{ isAtMaxGroups ? "保存" : "增加一组" }}</text>
       </view>
     </view>
 
@@ -250,6 +254,7 @@ import {
   getTargetTypeName,
   calculateGroupScore,
   generateId,
+  getFirstUnfilledScoreLocation,
 } from "@/utils/score.js";
 import { addScoreRecord } from "@/utils/storage.js";
 import { getThemeColor } from "@/utils/theme.js";
@@ -304,6 +309,11 @@ const totalArrows = computed(() => {
     0
   );
 });
+
+// 是否已达到最大组数
+const isAtMaxGroups = computed(
+  () => groupScoreList.value.length >= config.groupNum
+);
 
 // 检查一组是否填满
 const isGroupFilled = (groupIndex) => {
@@ -362,16 +372,45 @@ const selectTarget = (t) => {
 
 // 选择分组预设
 const selectGroupPreset = (preset) => {
-  config.groupNum = preset.groupNum;
-  config.arrowNum = preset.arrowNum;
-  showGroupPicker.value = false;
+  // 如果配置没有变化，直接关闭
+  if (
+    config.groupNum === preset.groupNum &&
+    config.arrowNum === preset.arrowNum
+  ) {
+    showGroupPicker.value = false;
+    return;
+  }
 
-  // 重新初始化分组（如果还没有开始计分）
+  // 检查是否有已填写的分数
   if (!hasAnyScore()) {
+    // 没有数据，直接更新配置并重新初始化
+    config.groupNum = preset.groupNum;
+    config.arrowNum = preset.arrowNum;
+    showGroupPicker.value = false;
     initGroups();
   } else {
-    // 如果已有分数，只更新每组的箭数（新增的组）
-    uni.showToast({ title: "预设已更新，新增组将使用新配置", icon: "none" });
+    // 有数据，弹窗确认
+    showGroupPicker.value = false;
+    uni.showModal({
+      title: "提示",
+      content:
+        "是否清空数据？\n\n选择【确定】：清空所有已填写的分数数据\n选择【取消】：自动分配分数到新分组（多出的箭分数会自动舍弃）",
+      confirmText: "清空数据",
+      cancelText: "重新分配",
+      success: (res) => {
+        if (res.confirm) {
+          // 用户选择清空数据
+          config.groupNum = preset.groupNum;
+          config.arrowNum = preset.arrowNum;
+          initGroups();
+          uni.showToast({ title: "已清空数据", icon: "success" });
+        } else if (res.cancel) {
+          // 用户选择重新分配数据
+          redistributeScores(preset.groupNum, preset.arrowNum);
+          uni.showToast({ title: "已重新分配数据", icon: "success" });
+        }
+      },
+    });
   }
 };
 
@@ -380,6 +419,69 @@ const hasAnyScore = () => {
   return groupScoreList.value.some((group) =>
     group.arrowScoreList.some((score) => score !== "")
   );
+};
+
+// 重新分配分数数据
+const redistributeScores = (newGroupNum, newArrowNum) => {
+  // 1. 收集所有已填写的分数（按顺序）
+  const allScores = [];
+  groupScoreList.value.forEach((group) => {
+    group.arrowScoreList.forEach((score) => {
+      if (score !== "") {
+        allScores.push(score);
+      }
+    });
+  });
+
+  // 2. 更新配置
+  config.groupNum = newGroupNum;
+  config.arrowNum = newArrowNum;
+
+  // 3. 清空现有分组
+  groupScoreList.value = [];
+  groupIdCounter = 0;
+
+  // 4. 根据新配置重新分配分数
+  const totalNewArrows = newGroupNum * newArrowNum;
+  let scoreIndex = 0;
+
+  for (let i = 0; i < newGroupNum; i++) {
+    groupIdCounter++;
+    const arrowScoreList = [];
+
+    for (let j = 0; j < newArrowNum; j++) {
+      if (scoreIndex < allScores.length) {
+        arrowScoreList.push(allScores[scoreIndex]);
+        scoreIndex++;
+      } else {
+        arrowScoreList.push("");
+      }
+    }
+
+    groupScoreList.value.push({
+      id: "group_" + groupIdCounter,
+      groupIndex: i + 1,
+      arrowScoreList: arrowScoreList,
+      groupTotalScore: 0,
+      accumulateScore: 0,
+      xCount: 0,
+      tenCount: 0,
+      missCount: 0,
+    });
+  }
+
+  // 5. 重新计算所有分数
+  recalculateAllScores();
+
+  // 6. 如果有多余的分数，提示用户
+  if (scoreIndex < allScores.length) {
+    const discardedCount = allScores.length - scoreIndex;
+    uni.showToast({
+      title: `已舍弃${discardedCount}支箭的分数`,
+      icon: "none",
+      duration: 2000,
+    });
+  }
 };
 
 // 初始化分组（只创建第一组）
@@ -401,6 +503,15 @@ const addEmptyGroup = () => {
     tenCount: 0,
     missCount: 0,
   });
+};
+
+// 增加一组或保存（根据是否达到最大组数）
+const handleAddOrSave = () => {
+  if (isAtMaxGroups.value) {
+    onSaveClick();
+  } else {
+    addGroupManual();
+  }
 };
 
 // 手动添加组
@@ -521,6 +632,11 @@ const onScoreClick = (groupIndex, scoreIndex) => {
   activeGroup.value = groupIndex;
   activeIndex.value = scoreIndex;
   showKeyboard.value = true;
+
+  // 延迟滚动到对应分组，确保键盘显示后可见
+  nextTick(() => {
+    scrollToView.value = "group-" + groupIndex;
+  });
 };
 
 // 点击页面其他区域
@@ -581,6 +697,25 @@ const onCancel = () => {
   }
 };
 
+// 保存按钮点击（达到最大组数时）
+const onSaveClick = () => {
+  if (!hasAnyScore()) {
+    uni.showToast({ title: "请先输入分数", icon: "none" });
+    return;
+  }
+  // 检查所有分数是否填写完整
+  const unfilled = getFirstUnfilledScoreLocation(groupScoreList.value);
+  if (unfilled) {
+    uni.showToast({
+      title: `第${unfilled.groupIndex + 1}组第${unfilled.arrowIndex + 1}箭未填写`,
+      icon: "none",
+      duration: 3000,
+    });
+    return;
+  }
+  showCompleteConfirm.value = true;
+};
+
 // 完成计分
 const onComplete = () => {
   if (!hasAnyScore()) {
@@ -592,6 +727,18 @@ const onComplete = () => {
 
 // 执行完成
 const doComplete = () => {
+  // 检查所有分数是否填写完整
+  const unfilled = getFirstUnfilledScoreLocation(groupScoreList.value);
+  if (unfilled) {
+    showCompleteConfirm.value = false;
+    uni.showToast({
+      title: `第${unfilled.groupIndex + 1}组第${unfilled.arrowIndex + 1}箭未填写`,
+      icon: "none",
+      duration: 3000,
+    });
+    return;
+  }
+
   // 过滤掉完全空白的组
   const validGroups = groupScoreList.value.filter((g) =>
     g.arrowScoreList.some((s) => s !== "")
@@ -724,6 +871,11 @@ onUnmounted(() => {
   padding: 24rpx 0;
   padding-bottom: 200rpx;
   box-sizing: border-box;
+  transition: padding-bottom 0.3s ease;
+
+  &.keyboard-active {
+    padding-bottom: 650rpx; // 键盘高度约450rpx + 操作按钮高度约200rpx
+  }
 }
 
 .score-section {

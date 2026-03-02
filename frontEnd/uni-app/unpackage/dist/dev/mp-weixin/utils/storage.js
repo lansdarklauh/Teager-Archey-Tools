@@ -102,7 +102,7 @@ const getUserInfo = () => {
     defaultBowType: "americanHuntingBow",
     defaultDistance: "30m",
     defaultTarget: "80Full",
-    defaultGroupArrow: "6组/6箭/共36箭",
+    defaultGroupArrow: "6箭/6组/共36箭",
     themeColor: "#00C853"
   });
 };

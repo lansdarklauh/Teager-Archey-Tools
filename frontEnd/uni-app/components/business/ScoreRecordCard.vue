@@ -107,10 +107,13 @@ const getModeLabel = (mode) => {
   return modes[mode] || mode;
 };
 
+// X/10/9黄 8/7红 6/5蓝 4/3黑白字 2/1白黑字黑边框 M灰黑字
 const getScoreClass = (score) => {
-  if (score === "X" || score === "10") return "score-gold";
-  if (score === "9" || score === "8") return "score-red";
-  if (score === "7" || score === "6") return "score-blue";
+  if (score === "X" || score === "10" || score === "9") return "score-gold";
+  if (score === "8" || score === "7") return "score-red";
+  if (score === "6" || score === "5") return "score-blue";
+  if (score === "4" || score === "3") return "score-black";
+  if (score === "2" || score === "1") return "score-white";
   if (score === "M") return "score-miss";
   return "score-default";
 };
@@ -273,10 +276,25 @@ const onDetailClick = () => {
   }
 }
 
-.score-miss {
-  background-color: #ccc;
+.score-black {
+  background-color: #000;
   text {
     color: #fff;
+  }
+}
+
+.score-white {
+  background-color: #fff;
+  border: 1px solid #000;
+  text {
+    color: #000;
+  }
+}
+
+.score-miss {
+  background-color: #9e9e9e;
+  text {
+    color: #000;
   }
 }
 

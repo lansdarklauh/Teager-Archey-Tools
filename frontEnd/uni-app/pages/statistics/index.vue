@@ -7,7 +7,7 @@
         <text class="stat-label">总记录</text>
       </view>
       <view class="stat-item">
-        <text class="stat-value">{{ statistics.avgScore }}</text>
+        <text class="stat-value">{{ formatDecimal2(statistics.avgScore) }}</text>
         <text class="stat-label">平均分</text>
       </view>
       <view class="stat-item">
@@ -15,7 +15,7 @@
         <text class="stat-label">最高分</text>
       </view>
       <view class="stat-item">
-        <text class="stat-value">{{ statistics.arrowAvg }}</text>
+        <text class="stat-value">{{ formatDecimal2(statistics.arrowAvg) }}</text>
         <text class="stat-label">箭均分</text>
       </view>
     </view>
@@ -63,7 +63,7 @@
           </view>
           <view class="detail-item">
             <text class="detail-label">中位数</text>
-            <text class="detail-value">{{ statistics.medianScore }}</text>
+            <text class="detail-value">{{ formatDecimal2(statistics.medianScore) }}</text>
           </view>
           <view class="detail-item">
             <text class="detail-label">众数</text>
@@ -87,27 +87,46 @@
           </view>
           <view class="detail-item">
             <text class="detail-label">X+10率</text>
-            <text class="detail-value">{{ xTenRate }}%</text>
+            <text class="detail-value">{{ formatDecimal2(xTenRate) }}%</text>
           </view>
         </view>
       </view>
     </view>
 
-    <!-- 环数分布 -->
-    <view class="chart-card">
-      <text class="card-title">环数分布</text>
-      <view class="ring-distribution">
-        <view
-          class="ring-item"
-          v-for="(item, key) in statistics.ringDistribution"
-          :key="key"
-          v-show="item > 0"
-        >
-          <view class="ring-bar" :style="{ width: getRingWidth(item) + '%' }">
-            <text class="ring-label">{{ key }}</text>
-            <text class="ring-count">{{ item }}</text>
+    <!-- 环数分布 - 使用 ucharts 组件 -->
+    <view class="chart-card" v-if="hasRingData">
+      <view class="chart-header">
+        <text class="card-title">环数分布</text>
+        <view class="chart-type-tabs">
+          <view
+            class="tab"
+            :class="{ active: ringChartType === 'column' }"
+            @click="ringChartType = 'column'"
+          >
+            <text>条形图</text>
+          </view>
+          <view
+            class="tab"
+            :class="{ active: ringChartType === 'pie' }"
+            @click="ringChartType = 'pie'"
+          >
+            <text>饼图</text>
           </view>
         </view>
+      </view>
+      <view class="ucharts-container" v-if="ringChartType === 'column'">
+        <qiun-data-charts
+          type="column"
+          :chartData="ringChartData"
+          :opts="ringColumnOpts"
+        />
+      </view>
+      <view class="ucharts-container" v-else>
+        <qiun-data-charts
+          type="pie"
+          :chartData="ringPieChartData"
+          :opts="ringPieOpts"
+        />
       </view>
     </view>
 
@@ -144,6 +163,8 @@ import {
 } from "@/utils/statistics.js";
 import { getBowTypeName, formatTime } from "@/utils/score.js";
 import { getThemeColor } from "@/utils/theme.js";
+import { RING_COLORS } from "@/utils/constants.js";
+import { formatDecimal2 } from "@/utils/number.js";
 
 // 主题色
 const themeColor = ref(getThemeColor());
@@ -151,6 +172,7 @@ const themeColor = ref(getThemeColor());
 // 数据
 const records = ref([]);
 const timeRange = ref("all");
+const ringChartType = ref("column");
 
 // 计算统计数据
 const filteredRecords = computed(() => {
@@ -163,27 +185,83 @@ const statistics = computed(() => {
 
 const xTenRate = computed(() => {
   if (statistics.value.totalArrows === 0) return 0;
-  return Math.round(
+  const rate =
     ((statistics.value.xTotal + statistics.value.tenTotal) /
       statistics.value.totalArrows) *
-      100
-  );
+    100;
+  return Math.round(rate * 100) / 100; // 保留2位小数，避免浮点问题
 });
 
 const recentRecords = computed(() => {
   return filteredRecords.value.slice(0, 5);
 });
 
-const maxRingCount = computed(() => {
-  return Math.max(...Object.values(statistics.value.ringDistribution || {}), 1);
+// 环数分布图表数据 - ucharts 柱状图格式（每柱应用对应环数颜色）
+const ringChartData = computed(() => {
+  const dist = statistics.value.ringDistribution || {};
+  const categories = ['X', '10', '9', '8', '7', '6', '5', '4', '3', '2', '1', 'M'];
+  const data = categories.map((key) => ({
+    value: dist[key] || 0,
+    color: RING_COLORS[key] || '#999',
+  }));
+  return {
+    categories,
+    series: [{ name: '环数', data }],
+  };
 });
+
+// 环数分布饼图数据 - ucharts 饼图格式（每块应用对应环数颜色）
+const ringPieChartData = computed(() => {
+  const dist = statistics.value.ringDistribution || {};
+  const rings = ['X', '10', '9', '8', '7', '6', '5', '4', '3', '2', '1', 'M'];
+  const pieData = rings
+    .filter((key) => (dist[key] || 0) > 0)
+    .map((key) => ({
+      name: key,
+      value: dist[key],
+      color: RING_COLORS[key] || '#999',
+    }));
+  return {
+    categories: [],
+    series: [{ name: '环数', data: pieData }],
+  };
+});
+
+const hasRingData = computed(() => {
+  const dist = statistics.value.ringDistribution || {};
+  return Object.values(dist).some((v) => v > 0);
+});
+
+// ucharts 配置（柱子间1px间隙）
+const ringColumnOpts = computed(() => ({
+  color: ['X', '10', '9', '8', '7', '6', '5', '4', '3', '2', '1', 'M'].map(
+    (r) => RING_COLORS[r]
+  ),
+  padding: [15, 10, 0, 15],
+  dataLabel: true,
+  xAxis: { disableGrid: true },
+  yAxis: { gridType: 'dash' },
+  extra: {
+    column: {
+      type: 'group',
+      width: 26,
+      meterBorder: 1,
+      meterFillColor: '#FFFFFF',
+    },
+  },
+}));
+
+const ringPieOpts = computed(() => ({
+  color: ['X', '10', '9', '8', '7', '6', '5', '4', '3', '2', '1', 'M'].map(
+    (r) => RING_COLORS[r]
+  ),
+  padding: [5, 5, 5, 5],
+  dataLabel: true,
+  legend: { show: true, position: 'right' },
+}));
 
 // 方法
 const getBowLabel = (value) => getBowTypeName(value);
-
-const getRingWidth = (count) => {
-  return Math.max((count / maxRingCount.value) * 100, 10);
-};
 
 const goToDetail = (record) => {
   uni.navigateTo({
@@ -329,37 +407,31 @@ watch(timeRange, () => {
   color: #333;
 }
 
-.ring-distribution {
+.chart-header {
   display: flex;
-  flex-direction: column;
-  gap: 12rpx;
-}
-
-.ring-item {
-  display: flex;
-  align-items: center;
-}
-
-.ring-bar {
-  height: 48rpx;
-  background-color: v-bind(themeColor);
-  border-radius: 8rpx;
-  display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 0 16rpx;
-  min-width: 80rpx;
+  align-items: center;
+  margin-bottom: 24rpx;
 }
 
-.ring-label {
-  font-size: 24rpx;
-  color: #fff;
-  font-weight: 500;
+.chart-type-tabs {
+  display: flex;
+  gap: 24rpx;
 }
 
-.ring-count {
-  font-size: 24rpx;
-  color: #fff;
+.chart-type-tabs .tab {
+  font-size: 26rpx;
+  color: #999;
+
+  &.active {
+    color: v-bind(themeColor);
+    font-weight: 500;
+  }
+}
+
+.ucharts-container {
+  height: 400rpx;
+  width: 100%;
 }
 
 .record-list {

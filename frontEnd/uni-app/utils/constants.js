@@ -36,10 +36,10 @@ export const TARGET_TYPES = [
 
 // 组数/箭数预设
 export const GROUP_ARROW_PRESETS = [
-    { groupNum: 3, arrowNum: 10, label: '3组/10箭/共30箭' },
-    { groupNum: 6, arrowNum: 6, label: '6组/6箭/共36箭' },
-    { groupNum: 6, arrowNum: 10, label: '6组/10箭/共60箭' },
-    { groupNum: 6, arrowNum: 12, label: '6组/12箭/共72箭' }
+    { groupNum: 10, arrowNum: 3, label: '3箭/10组/共30箭' },
+    { groupNum: 6, arrowNum: 6, label: '6箭/6组/共36箭' },
+    { groupNum: 10, arrowNum: 6, label: '6箭/10组/共60箭' },
+    { groupNum: 12, arrowNum: 6, label: '6箭/12组/共72箭' }
 ]
 
 // 计分模式
@@ -99,20 +99,21 @@ export const SORT_ORDERS = [
     { value: 'asc', label: '升序' }
 ]
 
-// 环数对应颜色（用于统计图表）
+// 环数对应颜色（用于统计图表、分数徽章）
+// X/10/9黄色 8/7红色 6/5蓝色 4/3黑色白字 2/1白色黑字黑边框 M灰色黑字
 export const RING_COLORS = {
-    'X': '#FFD700',   // 金色
-    '10': '#FFD700',  // 金色
-    '9': '#FFD700',   // 金色
+    'X': '#FFD700',   // 黄色
+    '10': '#FFD700',
+    '9': '#FFD700',
     '8': '#FF0000',   // 红色
-    '7': '#FF0000',   // 红色
+    '7': '#FF0000',
     '6': '#2196F3',   // 蓝色
-    '5': '#2196F3',   // 蓝色
+    '5': '#2196F3',
     '4': '#000000',   // 黑色
-    '3': '#000000',   // 黑色
-    '2': '#FFFFFF',   // 白色
-    '1': '#FFFFFF',   // 白色
-    'M': '#CCCCCC'    // 灰色
+    '3': '#000000',
+    '2': '#FFFFFF',   // 白色（需黑字黑边框）
+    '1': '#FFFFFF',
+    'M': '#9E9E9E'    // 灰色
 }
 
 // 主题色选项

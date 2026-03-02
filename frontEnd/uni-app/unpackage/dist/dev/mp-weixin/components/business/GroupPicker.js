@@ -11,6 +11,10 @@ const _sfc_main = {
     defaultArrowNum: {
       type: Number,
       default: 6
+    },
+    hasExistingData: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ["confirm", "close"],
@@ -48,12 +52,28 @@ const _sfc_main = {
     const onConfirm = () => {
       const g = parseInt(groupNum.value) || 6;
       const a = parseInt(arrowNum.value) || 6;
-      emit("confirm", {
-        groupNum: g,
-        arrowNum: a,
-        totalArrows: g * a,
-        label: `${g}组/${a}箭/共${g * a}箭`
-      });
+      if (g === props.defaultGroupNum && a === props.defaultArrowNum) {
+        emit("close");
+        return;
+      }
+      if (props.hasExistingData) {
+        emit("confirm", {
+          groupNum: g,
+          arrowNum: a,
+          totalArrows: g * a,
+          label: `${a}箭/${g}组/共${g * a}箭`,
+          needConfirm: true
+          // 标记需要二次确认
+        });
+      } else {
+        emit("confirm", {
+          groupNum: g,
+          arrowNum: a,
+          totalArrows: g * a,
+          label: `${a}箭/${g}组/共${g * a}箭`,
+          needConfirm: false
+        });
+      }
     };
     const onClose = () => {
       emit("close");

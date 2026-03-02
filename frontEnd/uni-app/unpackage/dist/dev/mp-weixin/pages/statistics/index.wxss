@@ -119,33 +119,27 @@
   font-weight: 500;
   color: #333;
 }
-.ring-distribution.data-v-6e199430 {
+.chart-header.data-v-6e199430 {
   display: flex;
-  flex-direction: column;
-  gap: 12rpx;
-}
-.ring-item.data-v-6e199430 {
-  display: flex;
-  align-items: center;
-}
-.ring-bar.data-v-6e199430 {
-  height: 48rpx;
-  background-color: var(--4af8cf5f);
-  border-radius: 8rpx;
-  display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 0 16rpx;
-  min-width: 80rpx;
+  align-items: center;
+  margin-bottom: 24rpx;
 }
-.ring-label.data-v-6e199430 {
-  font-size: 24rpx;
-  color: #fff;
+.chart-type-tabs.data-v-6e199430 {
+  display: flex;
+  gap: 24rpx;
+}
+.chart-type-tabs .tab.data-v-6e199430 {
+  font-size: 26rpx;
+  color: #999;
+}
+.chart-type-tabs .tab.active.data-v-6e199430 {
+  color: var(--4af8cf5f);
   font-weight: 500;
 }
-.ring-count.data-v-6e199430 {
-  font-size: 24rpx;
-  color: #fff;
+.ucharts-container.data-v-6e199430 {
+  height: 400rpx;
+  width: 100%;
 }
 .record-list.data-v-6e199430 {
   display: flex;

@@ -37,23 +37,45 @@
       </view>
 
       <view class="time-input" v-if="enableTimeFilter">
-        <view
-          class="date-picker"
-          @click="pickDate('start')"
-          v-if="timeType === 'single'"
-        >
-          <text class="date-text">{{ startDate || "选择时间" }}</text>
-          <text class="date-icon">📅</text>
+        <view v-if="timeType === 'single'" class="date-picker-wrap">
+          <picker
+            mode="date"
+            :value="startDate"
+            :start="datePickerStart"
+            :end="datePickerEnd"
+            @change="onDateChange('start', $event)"
+          >
+            <view class="date-picker">
+              <text class="date-text">{{ startDate || "选择日期" }}</text>
+              <text class="date-icon">📅</text>
+            </view>
+          </picker>
         </view>
         <view class="date-range" v-else>
           <text class="range-label">日期区间</text>
-          <view class="date-picker" @click="pickDate('start')">
-            <text class="date-text">{{ startDate || "开始日期" }}</text>
-          </view>
+          <picker
+            mode="date"
+            :value="startDate"
+            :start="datePickerStart"
+            :end="endDate || datePickerEnd"
+            @change="onDateChange('start', $event)"
+          >
+            <view class="date-picker">
+              <text class="date-text">{{ startDate || "开始日期" }}</text>
+            </view>
+          </picker>
           <text class="range-sep">-</text>
-          <view class="date-picker" @click="pickDate('end')">
-            <text class="date-text">{{ endDate || "结束日期" }}</text>
-          </view>
+          <picker
+            mode="date"
+            :value="endDate"
+            :start="startDate || datePickerStart"
+            :end="datePickerEnd"
+            @change="onDateChange('end', $event)"
+          >
+            <view class="date-picker">
+              <text class="date-text">{{ endDate || "结束日期" }}</text>
+            </view>
+          </picker>
           <text class="date-icon">📅</text>
         </view>
       </view>
@@ -114,6 +136,7 @@
 <script setup>
 import { ref, computed } from "vue";
 import { getThemeColor } from "@/utils/theme.js";
+import { parseToTimestamp, formatDate } from "@/utils/date.js";
 
 const props = defineProps({
   filter: {
@@ -146,9 +169,23 @@ const toggleScoreFilter = () => {
   enableScoreFilter.value = !enableScoreFilter.value;
 };
 
-const pickDate = (type) => {
-  uni.showToast({ title: "请选择日期", icon: "none" });
-  // 这里可以使用日期选择器
+// 日期选择器范围：近一年
+const datePickerStart = computed(() => {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() - 1);
+  return formatDate(d.getTime(), "YYYY-MM-DD");
+});
+const datePickerEnd = computed(() => {
+  return formatDate(Date.now(), "YYYY-MM-DD");
+});
+
+const onDateChange = (type, e) => {
+  const val = e.detail?.value || e;
+  if (type === "start") {
+    startDate.value = val;
+  } else {
+    endDate.value = val;
+  }
 };
 
 const onMinMove = (e) => {
@@ -175,14 +212,14 @@ const onApply = () => {
 
   if (enableTimeFilter.value) {
     if (timeType.value === "single" && startDate.value) {
-      filter.startTime = new Date(startDate.value).getTime();
+      filter.startTime = parseToTimestamp(startDate.value);
       filter.endTime = filter.startTime + 24 * 60 * 60 * 1000;
     } else if (timeType.value === "range") {
       if (startDate.value)
-        filter.startTime = new Date(startDate.value).getTime();
+        filter.startTime = parseToTimestamp(startDate.value);
       if (endDate.value)
         filter.endTime =
-          new Date(endDate.value).getTime() + 24 * 60 * 60 * 1000;
+          parseToTimestamp(endDate.value) + 24 * 60 * 60 * 1000;
     }
   }
 

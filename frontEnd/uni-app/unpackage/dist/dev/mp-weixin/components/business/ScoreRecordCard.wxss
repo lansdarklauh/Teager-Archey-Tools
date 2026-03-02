@@ -144,11 +144,24 @@
 .score-blue text.data-v-962cd50f {
   color: #fff;
 }
+.score-black.data-v-962cd50f {
+  background-color: #000;
+}
+.score-black text.data-v-962cd50f {
+  color: #fff;
+}
+.score-white.data-v-962cd50f {
+  background-color: #fff;
+  border: 1px solid #000;
+}
+.score-white text.data-v-962cd50f {
+  color: #000;
+}
 .score-miss.data-v-962cd50f {
-  background-color: #ccc;
+  background-color: #9e9e9e;
 }
 .score-miss text.data-v-962cd50f {
-  color: #fff;
+  color: #000;
 }
 .score-default.data-v-962cd50f {
   background-color: #333;

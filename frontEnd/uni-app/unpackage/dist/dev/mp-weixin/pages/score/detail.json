@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "计分详情",
-  "usingComponents": {}
+  "usingComponents": {
+    "qiun-data-charts": "../../uni_modules/qiun-data-charts/components/qiun-data-charts/qiun-data-charts"
+  }
 }

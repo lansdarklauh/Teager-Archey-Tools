@@ -1,6 +1,8 @@
 /**
  * 计分相关工具函数
  */
+import { formatTime, formatDate } from './date.js'
+import { round2 } from './number.js'
 
 /**
  * 生成唯一ID
@@ -184,14 +186,14 @@ export const calculateTotalScore = (groupScoreList) => {
 }
 
 /**
- * 计算箭均分
+ * 计算箭均分（保留2位小数，避免浮点精度问题）
  * @param {number} totalScore - 总分
  * @param {number} totalArrowNum - 总箭数
- * @returns {string} - 箭均分（保留2位小数）
+ * @returns {string} - 箭均分
  */
 export const calculateArrowAverage = (totalScore, totalArrowNum) => {
     if (totalArrowNum === 0) return '0.00'
-    return (totalScore / totalArrowNum).toFixed(2)
+    return round2(totalScore / totalArrowNum).toFixed(2)
 }
 
 /**
@@ -256,32 +258,11 @@ export const getTargetTypeName = (targetType) => {
 }
 
 /**
- * 格式化时间戳
+ * 格式化时间戳 - 使用 dayjs 处理
  * @param {number} timestamp - 时间戳
  * @returns {string} - 格式化后的时间字符串
  */
-export const formatTime = (timestamp) => {
-    const date = new Date(timestamp)
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    const hour = String(date.getHours()).padStart(2, '0')
-    const minute = String(date.getMinutes()).padStart(2, '0')
-    return `${year}/${month}/${day} ${hour}:${minute}`
-}
-
-/**
- * 格式化日期
- * @param {number} timestamp - 时间戳
- * @returns {string} - 格式化后的日期字符串
- */
-export const formatDate = (timestamp) => {
-    const date = new Date(timestamp)
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    return `${year}-${month}-${day}`
-}
+export { formatTime, formatDate }
 
 /**
  * 检查分数是否全部填写
@@ -290,6 +271,36 @@ export const formatDate = (timestamp) => {
  */
 export const isAllScoresFilled = (arrowScores) => {
     return arrowScores.every(score => score !== '' && score !== null && score !== undefined)
+}
+
+/**
+ * 获取单组中第一个未填写分数的箭索引
+ * @param {Array} arrowScores - 箭分数列表
+ * @returns {number} - 第一个未填写的箭索引，全部填写则返回-1
+ */
+export const getFirstUnfilledArrowIndex = (arrowScores) => {
+    const index = arrowScores.findIndex(
+        score => score === '' || score === null || score === undefined
+    )
+    return index >= 0 ? index : -1
+}
+
+/**
+ * 获取第一个未填写分数的位置
+ * @param {Array} groupScoreList - 组分数列表
+ * @returns {{ groupIndex: number, arrowIndex: number } | null} - 第一个未填写位置，全部填写则返回null
+ */
+export const getFirstUnfilledScoreLocation = (groupScoreList) => {
+    for (let g = 0; g < groupScoreList.length; g++) {
+        const arrowScoreList = groupScoreList[g].arrowScoreList || []
+        for (let a = 0; a < arrowScoreList.length; a++) {
+            const score = arrowScoreList[a]
+            if (score === '' || score === null || score === undefined) {
+                return { groupIndex: g, arrowIndex: a }
+            }
+        }
+    }
+    return null
 }
 
 export default {
@@ -310,5 +321,7 @@ export default {
     getTargetTypeName,
     formatTime,
     formatDate,
-    isAllScoresFilled
+    isAllScoresFilled,
+    getFirstUnfilledArrowIndex,
+    getFirstUnfilledScoreLocation
 }

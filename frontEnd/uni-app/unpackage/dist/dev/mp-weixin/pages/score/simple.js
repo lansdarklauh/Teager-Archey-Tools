@@ -52,6 +52,9 @@ const _sfc_main = {
         0
       );
     });
+    const isAtMaxGroups = common_vendor.computed(
+      () => groupScoreList.value.length >= config.groupNum
+    );
     const isGroupFilled = (groupIndex) => {
       const group = groupScoreList.value[groupIndex];
       if (!group)
@@ -88,19 +91,86 @@ const _sfc_main = {
       showTargetPicker.value = false;
     };
     const selectGroupPreset = (preset) => {
-      config.groupNum = preset.groupNum;
-      config.arrowNum = preset.arrowNum;
-      showGroupPicker.value = false;
+      if (config.groupNum === preset.groupNum && config.arrowNum === preset.arrowNum) {
+        showGroupPicker.value = false;
+        return;
+      }
       if (!hasAnyScore()) {
+        config.groupNum = preset.groupNum;
+        config.arrowNum = preset.arrowNum;
+        showGroupPicker.value = false;
         initGroups();
       } else {
-        common_vendor.index.showToast({ title: "预设已更新，新增组将使用新配置", icon: "none" });
+        showGroupPicker.value = false;
+        common_vendor.index.showModal({
+          title: "提示",
+          content: "是否清空数据？\n\n选择【确定】：清空所有已填写的分数数据\n选择【取消】：自动分配分数到新分组（多出的箭分数会自动舍弃）",
+          confirmText: "清空数据",
+          cancelText: "重新分配",
+          success: (res) => {
+            if (res.confirm) {
+              config.groupNum = preset.groupNum;
+              config.arrowNum = preset.arrowNum;
+              initGroups();
+              common_vendor.index.showToast({ title: "已清空数据", icon: "success" });
+            } else if (res.cancel) {
+              redistributeScores(preset.groupNum, preset.arrowNum);
+              common_vendor.index.showToast({ title: "已重新分配数据", icon: "success" });
+            }
+          }
+        });
       }
     };
     const hasAnyScore = () => {
       return groupScoreList.value.some(
         (group) => group.arrowScoreList.some((score) => score !== "")
       );
+    };
+    const redistributeScores = (newGroupNum, newArrowNum) => {
+      const allScores = [];
+      groupScoreList.value.forEach((group) => {
+        group.arrowScoreList.forEach((score) => {
+          if (score !== "") {
+            allScores.push(score);
+          }
+        });
+      });
+      config.groupNum = newGroupNum;
+      config.arrowNum = newArrowNum;
+      groupScoreList.value = [];
+      groupIdCounter = 0;
+      let scoreIndex = 0;
+      for (let i = 0; i < newGroupNum; i++) {
+        groupIdCounter++;
+        const arrowScoreList = [];
+        for (let j = 0; j < newArrowNum; j++) {
+          if (scoreIndex < allScores.length) {
+            arrowScoreList.push(allScores[scoreIndex]);
+            scoreIndex++;
+          } else {
+            arrowScoreList.push("");
+          }
+        }
+        groupScoreList.value.push({
+          id: "group_" + groupIdCounter,
+          groupIndex: i + 1,
+          arrowScoreList,
+          groupTotalScore: 0,
+          accumulateScore: 0,
+          xCount: 0,
+          tenCount: 0,
+          missCount: 0
+        });
+      }
+      recalculateAllScores();
+      if (scoreIndex < allScores.length) {
+        const discardedCount = allScores.length - scoreIndex;
+        common_vendor.index.showToast({
+          title: `已舍弃${discardedCount}支箭的分数`,
+          icon: "none",
+          duration: 2e3
+        });
+      }
     };
     const initGroups = () => {
       groupScoreList.value = [];
@@ -118,6 +188,13 @@ const _sfc_main = {
         tenCount: 0,
         missCount: 0
       });
+    };
+    const handleAddOrSave = () => {
+      if (isAtMaxGroups.value) {
+        onSaveClick();
+      } else {
+        addGroupManual();
+      }
     };
     const addGroupManual = () => {
       if (groupScoreList.value.length >= config.groupNum) {
@@ -222,6 +299,9 @@ const _sfc_main = {
       activeGroup.value = groupIndex;
       activeIndex.value = scoreIndex;
       showKeyboard.value = true;
+      common_vendor.nextTick$1(() => {
+        scrollToView.value = "group-" + groupIndex;
+      });
     };
     const onPageClick = () => {
       if (showKeyboard.value) {
@@ -262,7 +342,33 @@ const _sfc_main = {
         common_vendor.index.navigateBack();
       }
     };
+    const onSaveClick = () => {
+      if (!hasAnyScore()) {
+        common_vendor.index.showToast({ title: "请先输入分数", icon: "none" });
+        return;
+      }
+      const unfilled = utils_score.getFirstUnfilledScoreLocation(groupScoreList.value);
+      if (unfilled) {
+        common_vendor.index.showToast({
+          title: `第${unfilled.groupIndex + 1}组第${unfilled.arrowIndex + 1}箭未填写`,
+          icon: "none",
+          duration: 3e3
+        });
+        return;
+      }
+      showCompleteConfirm.value = true;
+    };
     const doComplete = () => {
+      const unfilled = utils_score.getFirstUnfilledScoreLocation(groupScoreList.value);
+      if (unfilled) {
+        showCompleteConfirm.value = false;
+        common_vendor.index.showToast({
+          title: `第${unfilled.groupIndex + 1}组第${unfilled.arrowIndex + 1}箭未填写`,
+          icon: "none",
+          duration: 3e3
+        });
+        return;
+      }
       const validGroups = groupScoreList.value.filter(
         (g) => g.arrowScoreList.some((s) => s !== "")
       );
@@ -366,18 +472,20 @@ const _sfc_main = {
           });
         }),
         o: groupScoreList.value.length > 1,
-        p: scrollToView.value,
-        q: common_vendor.o(onCancel),
-        r: common_vendor.o(addGroupManual),
-        s: common_vendor.o(onKeyInput),
-        t: common_vendor.o(onKeyDelete),
-        v: common_vendor.o(onKeyDone),
-        w: common_vendor.o(($event) => showKeyboard.value = false),
-        x: common_vendor.p({
+        p: showKeyboard.value ? 1 : "",
+        q: scrollToView.value,
+        r: common_vendor.o(onCancel),
+        s: common_vendor.t(isAtMaxGroups.value ? "保存" : "增加一组"),
+        t: common_vendor.o(handleAddOrSave),
+        v: common_vendor.o(onKeyInput),
+        w: common_vendor.o(onKeyDelete),
+        x: common_vendor.o(onKeyDone),
+        y: common_vendor.o(($event) => showKeyboard.value = false),
+        z: common_vendor.p({
           visible: showKeyboard.value,
           title: `第${activeGroup.value + 1}组 第${activeIndex.value + 1}箭`
         }),
-        y: common_vendor.f(bowTypes.value, (bow, k0, i0) => {
+        A: common_vendor.f(bowTypes.value, (bow, k0, i0) => {
           return {
             a: common_vendor.t(bow.label),
             b: config.bowType === bow.value ? 1 : "",
@@ -385,14 +493,14 @@ const _sfc_main = {
             d: common_vendor.o(($event) => selectBow(bow), bow.value)
           };
         }),
-        z: common_vendor.o(($event) => showBowPicker.value = $event),
-        A: common_vendor.p({
+        B: common_vendor.o(($event) => showBowPicker.value = $event),
+        C: common_vendor.p({
           title: "选择弓种",
           position: "bottom",
           showFooter: false,
           visible: showBowPicker.value
         }),
-        B: common_vendor.f(distances.value, (d, k0, i0) => {
+        D: common_vendor.f(distances.value, (d, k0, i0) => {
           return {
             a: common_vendor.t(d.label),
             b: config.distance === d.value ? 1 : "",
@@ -400,14 +508,14 @@ const _sfc_main = {
             d: common_vendor.o(($event) => selectDistance(d), d.value)
           };
         }),
-        C: common_vendor.o(($event) => showDistancePicker.value = $event),
-        D: common_vendor.p({
+        E: common_vendor.o(($event) => showDistancePicker.value = $event),
+        F: common_vendor.p({
           title: "选择距离",
           position: "bottom",
           showFooter: false,
           visible: showDistancePicker.value
         }),
-        E: common_vendor.f(targetTypes.value, (t, k0, i0) => {
+        G: common_vendor.f(targetTypes.value, (t, k0, i0) => {
           return {
             a: common_vendor.t(t.label),
             b: config.targetType === t.value ? 1 : "",
@@ -415,14 +523,14 @@ const _sfc_main = {
             d: common_vendor.o(($event) => selectTarget(t), t.value)
           };
         }),
-        F: common_vendor.o(($event) => showTargetPicker.value = $event),
-        G: common_vendor.p({
+        H: common_vendor.o(($event) => showTargetPicker.value = $event),
+        I: common_vendor.p({
           title: "选择靶面",
           position: "bottom",
           showFooter: false,
           visible: showTargetPicker.value
         }),
-        H: common_vendor.f(groupPresets.value, (preset, k0, i0) => {
+        J: common_vendor.f(groupPresets.value, (preset, k0, i0) => {
           return {
             a: common_vendor.t(preset.label),
             b: isPresetActive(preset) ? 1 : "",
@@ -430,25 +538,25 @@ const _sfc_main = {
             d: common_vendor.o(($event) => selectGroupPreset(preset), preset.label)
           };
         }),
-        I: common_vendor.o(($event) => showGroupPicker.value = $event),
-        J: common_vendor.p({
+        K: common_vendor.o(($event) => showGroupPicker.value = $event),
+        L: common_vendor.p({
           title: "选择分组",
           position: "bottom",
           showFooter: false,
           visible: showGroupPicker.value
         }),
-        K: common_vendor.t(totalScore.value),
-        L: common_vendor.t(groupScoreList.value.length),
-        M: common_vendor.t(totalArrows.value),
-        N: common_vendor.o(doComplete),
-        O: common_vendor.o(($event) => showCompleteConfirm.value = false),
-        P: common_vendor.o(($event) => showCompleteConfirm.value = $event),
-        Q: common_vendor.p({
+        M: common_vendor.t(totalScore.value),
+        N: common_vendor.t(groupScoreList.value.length),
+        O: common_vendor.t(totalArrows.value),
+        P: common_vendor.o(doComplete),
+        Q: common_vendor.o(($event) => showCompleteConfirm.value = false),
+        R: common_vendor.o(($event) => showCompleteConfirm.value = $event),
+        S: common_vendor.p({
           title: "完成计分",
           visible: showCompleteConfirm.value
         }),
-        R: common_vendor.o(onPageClick),
-        S: common_vendor.s(_ctx.__cssVars())
+        T: common_vendor.o(onPageClick),
+        U: common_vendor.s(_ctx.__cssVars())
       };
     };
   }

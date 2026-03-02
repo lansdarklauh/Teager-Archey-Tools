@@ -68,8 +68,11 @@
       </view>
     </view>
 
-    <!-- 环数分布图表 -->
-    <view class="chart-section" v-if="record.scoreMode !== 'custom'">
+    <!-- 环数分布图表 - 使用 ucharts -->
+    <view
+      class="chart-section"
+      v-if="record.scoreMode !== 'custom' && hasRingData"
+    >
       <view class="section-header">
         <text class="section-title">环数分布</text>
         <view class="chart-type-tabs">
@@ -78,92 +81,47 @@
             :class="{ active: chartType === 'bar' }"
             @click="chartType = 'bar'"
           >
-            <text>● 条形图</text>
+            <text>条形图</text>
           </view>
           <view
             class="tab"
             :class="{ active: chartType === 'pie' }"
             @click="chartType = 'pie'"
           >
-            <text>○ 饼图</text>
+            <text>饼图</text>
           </view>
         </view>
       </view>
-
-      <!-- 条形图 -->
-      <view class="bar-chart" v-if="chartType === 'bar'">
-        <view class="chart-container">
-          <view class="y-axis">
-            <text v-for="y in yAxisLabels" :key="y">{{ y }}</text>
-          </view>
-          <view class="bars">
-            <view
-              class="bar-item"
-              v-for="item in ringDistribution"
-              :key="item.ring"
-            >
-              <view
-                class="bar"
-                :class="getBarClass(item.ring)"
-                :style="{ height: getBarHeight(item.count) + 'rpx' }"
-              >
-                <text class="bar-value" v-if="item.count > 0">{{
-                  item.count
-                }}</text>
-              </view>
-              <text class="bar-label">{{ item.ring }}</text>
-            </view>
-          </view>
-        </view>
+      <view class="ucharts-container" v-if="chartType === 'bar'">
+        <qiun-data-charts
+          type="column"
+          :chartData="ringColumnChartData"
+          :opts="ringColumnOpts"
+        />
       </view>
-
-      <!-- 饼图占位 -->
-      <view class="pie-chart" v-else>
-        <view class="pie-container">
-          <view class="pie-legend">
-            <view
-              class="legend-item"
-              v-for="item in ringDistribution"
-              :key="item.ring"
-              v-show="item.count > 0"
-            >
-              <view class="legend-color" :class="getBarClass(item.ring)"></view>
-              <text
-                >{{ item.ring }}: {{ item.count }} ({{
-                  getPercent(item.count)
-                }}%)</text
-              >
-            </view>
-          </view>
-        </view>
+      <view class="ucharts-container" v-else>
+        <qiun-data-charts
+          type="pie"
+          :chartData="ringPieChartData"
+          :opts="ringPieOpts"
+        />
       </view>
     </view>
 
-    <!-- 组分变化 -->
-    <view class="chart-section" v-if="record.scoreMode !== 'custom'">
+    <!-- 组分变化 - 使用 ucharts 折线图 -->
+    <view
+      class="chart-section"
+      v-if="record.scoreMode !== 'custom' && hasGroupData"
+    >
       <view class="section-header">
         <text class="section-title">组分变化</text>
       </view>
-      <view class="line-chart">
-        <view class="chart-container">
-          <view class="line-points">
-            <view
-              class="point-item"
-              v-for="(group, index) in record.groupScoreList"
-              :key="index"
-            >
-              <view
-                class="point"
-                :style="{
-                  bottom: getPointPosition(group.groupTotalScore) + 'rpx',
-                }"
-              >
-                <text class="point-value">{{ group.groupTotalScore }}</text>
-              </view>
-              <text class="point-label">{{ index + 1 }}</text>
-            </view>
-          </view>
-        </view>
+      <view class="ucharts-container">
+        <qiun-data-charts
+          type="line"
+          :chartData="groupLineChartData"
+          :opts="groupLineOpts"
+        />
       </view>
     </view>
 
@@ -189,6 +147,8 @@ import {
   calculateArrowAverage,
 } from "@/utils/score.js";
 import { generateRingDistribution } from "@/utils/statistics.js";
+import { RING_COLORS } from "@/utils/constants.js";
+import { formatDecimal2 } from "@/utils/number.js";
 
 // 记录数据
 const record = ref({
@@ -212,28 +172,28 @@ const chartType = ref("bar");
 const arrowAverage = computed(() => {
   return calculateArrowAverage(
     record.value.totalScore,
-    record.value.totalArrowNum
+    record.value.totalArrowNum,
   );
 });
 
 const totalGroupScore = computed(() => {
-  return (
-    record.value.groupScoreList.reduce((sum, g) => sum + g.groupTotalScore, 0) /
-      record.value.groupScoreList.length || 0
-  );
+  const list = record.value.groupScoreList;
+  if (!list || list.length === 0) return "0.00";
+  const sum = list.reduce((s, g) => s + (g.groupTotalScore || 0), 0);
+  return formatDecimal2(sum / list.length);
 });
 
 const totalX = computed(() => {
   return record.value.groupScoreList.reduce(
     (sum, g) => sum + (g.xCount || 0),
-    0
+    0,
   );
 });
 
 const totalXTen = computed(() => {
   return record.value.groupScoreList.reduce(
     (sum, g) => sum + (g.xCount || 0) + (g.tenCount || 0),
-    0
+    0,
   );
 });
 
@@ -245,21 +205,91 @@ const totalArrows = computed(() => {
   return ringDistribution.value.reduce((sum, item) => sum + item.count, 0);
 });
 
-const maxCount = computed(() => {
-  return Math.max(...ringDistribution.value.map((item) => item.count), 1);
+// ucharts 环数柱状图数据（每柱应用对应环数颜色）
+const ringColumnChartData = computed(() => {
+  const dist = ringDistribution.value;
+  const categories = dist.map((d) => d.ring);
+  const data = dist.map((d) => ({
+    value: d.count,
+    color: RING_COLORS[d.ring] || "#999",
+  }));
+  return {
+    categories,
+    series: [{ name: "环数", data }],
+  };
 });
 
-const yAxisLabels = computed(() => {
-  const max = maxCount.value;
-  const step = Math.ceil(max / 5);
-  return [
-    max,
-    Math.round(max * 0.75),
-    Math.round(max * 0.5),
-    Math.round(max * 0.25),
-    0,
-  ].reverse();
+// ucharts 环数饼图数据（每块应用对应环数颜色）
+const ringPieChartData = computed(() => {
+  const dist = ringDistribution.value.filter((d) => d.count > 0);
+  return {
+    categories: [],
+    series: [
+      {
+        name: "环数",
+        data: dist.map((d) => ({
+          name: d.ring,
+          value: d.count,
+          color: RING_COLORS[d.ring] || "#999",
+        })),
+      },
+    ],
+  };
 });
+
+// ucharts 组分折线图数据
+const groupLineChartData = computed(() => {
+  const groups = record.value.groupScoreList || [];
+  const categories = groups.map((_, i) => String(i + 1));
+  const data = groups.map((g) => g.groupTotalScore || 0);
+  return {
+    categories,
+    series: [{ name: "组分", data }],
+  };
+});
+
+const hasRingData = computed(() => totalArrows.value > 0);
+
+const hasGroupData = computed(
+  () => record.value.groupScoreList && record.value.groupScoreList.length > 0,
+);
+
+// ucharts 配置（柱子间1px间隙）
+const ringColumnOpts = {
+  color: ["X", "10", "9", "8", "7", "6", "5", "4", "3", "2", "1", "M"].map(
+    (r) => RING_COLORS[r],
+  ),
+  padding: [15, 10, 0, 15],
+  dataLabel: true,
+  xAxis: { disableGrid: true },
+  yAxis: { gridType: "dash" },
+  extra: {
+    column: {
+      type: "group",
+      width: 20,
+      meterBorder: 1,
+      meterFillColor: "#FFFFFF",
+    },
+  },
+};
+
+const ringPieOpts = {
+  color: ["X", "10", "9", "8", "7", "6", "5", "4", "3", "2", "1", "M"].map(
+    (r) => RING_COLORS[r],
+  ),
+  padding: [5, 5, 5, 5],
+  dataLabel: true,
+  legend: { show: true, position: "right" },
+};
+
+const groupLineOpts = {
+  color: ["#00c853"],
+  padding: [15, 10, 0, 15],
+  dataLabel: true,
+  xAxis: { disableGrid: true },
+  yAxis: { gridType: "dash" },
+  extra: { line: { type: "curve", width: 2 } },
+};
 
 // 方法
 const getModeLabel = (mode) => {
@@ -270,38 +300,15 @@ const getModeLabel = (mode) => {
 const getBowLabel = (value) => getBowTypeName(value);
 const getTargetLabel = (value) => getTargetTypeName(value);
 
+// X/10/9黄 8/7红 6/5蓝 4/3黑白字 2/1白黑字黑边框 M灰黑字
 const getScoreClass = (score) => {
-  if (score === "X" || score === "10") return "score-gold";
-  if (score === "9" || score === "8") return "score-red";
-  if (score === "7" || score === "6") return "score-blue";
+  if (score === "X" || score === "10" || score === "9") return "score-gold";
+  if (score === "8" || score === "7") return "score-red";
+  if (score === "6" || score === "5") return "score-blue";
+  if (score === "4" || score === "3") return "score-black";
+  if (score === "2" || score === "1") return "score-white";
   if (score === "M") return "score-miss";
   return "score-default";
-};
-
-const getBarClass = (ring) => {
-  if (ring === "X" || ring === "10" || ring === "9") return "bar-gold";
-  if (ring === "8" || ring === "7") return "bar-red";
-  if (ring === "6" || ring === "5") return "bar-blue";
-  if (ring === "M") return "bar-miss";
-  return "bar-default";
-};
-
-const getBarHeight = (count) => {
-  if (count === 0) return 0;
-  return Math.max((count / maxCount.value) * 200, 10);
-};
-
-const getPercent = (count) => {
-  if (totalArrows.value === 0) return 0;
-  return Math.round((count / totalArrows.value) * 100);
-};
-
-const getPointPosition = (score) => {
-  const maxScore = Math.max(
-    ...record.value.groupScoreList.map((g) => g.groupTotalScore),
-    60
-  );
-  return (score / maxScore) * 150;
 };
 
 // 分享
@@ -444,6 +451,7 @@ onMounted(() => {
 .col-acc,
 .col-x {
   width: 80rpx;
+  text-align: center;
 }
 
 .table-body {
@@ -509,10 +517,25 @@ onMounted(() => {
   }
 }
 
-.score-miss {
-  background-color: #ccc;
+.score-black {
+  background-color: #000;
   text {
     color: #fff;
+  }
+}
+
+.score-white {
+  background-color: #fff;
+  border: 1px solid #000;
+  text {
+    color: #000;
+  }
+}
+
+.score-miss {
+  background-color: #9e9e9e;
+  text {
+    color: #000;
   }
 }
 
@@ -566,149 +589,9 @@ onMounted(() => {
   }
 }
 
-.bar-chart,
-.pie-chart,
-.line-chart {
-  padding: 16rpx 0;
-}
-
-.chart-container {
-  display: flex;
-}
-
-.y-axis {
-  display: flex;
-  flex-direction: column-reverse;
-  justify-content: space-between;
-  width: 60rpx;
-  height: 250rpx;
-  padding-bottom: 40rpx;
-
-  text {
-    font-size: 20rpx;
-    color: #999;
-    text-align: right;
-  }
-}
-
-.bars {
-  flex: 1;
-  display: flex;
-  justify-content: space-around;
-  align-items: flex-end;
-  height: 250rpx;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 40rpx;
-}
-
-.bar-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.bar {
-  width: 36rpx;
-  border-radius: 4rpx 4rpx 0 0;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding-top: 4rpx;
-  min-height: 4rpx;
-}
-
-.bar-value {
-  font-size: 18rpx;
-  color: #fff;
-}
-
-.bar-label {
-  font-size: 20rpx;
-  color: #666;
-  margin-top: 8rpx;
-}
-
-.bar-gold {
-  background-color: #2196f3;
-}
-
-.bar-red {
-  background-color: #ff0000;
-}
-
-.bar-blue {
-  background-color: #2196f3;
-}
-
-.bar-miss {
-  background-color: #ccc;
-}
-
-.bar-default {
-  background-color: #333;
-}
-
-.pie-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16rpx;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-
-  text {
-    font-size: 24rpx;
-    color: #666;
-  }
-}
-
-.legend-color {
-  width: 24rpx;
-  height: 24rpx;
-  border-radius: 4rpx;
-  margin-right: 8rpx;
-}
-
-.line-points {
-  flex: 1;
-  display: flex;
-  justify-content: space-around;
-  height: 200rpx;
-  border-bottom: 1px solid #eee;
-  position: relative;
-}
-
-.point-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-  height: 100%;
-}
-
-.point {
-  position: absolute;
-  width: 32rpx;
-  height: 32rpx;
-  background-color: #00c853;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.point-value {
-  font-size: 18rpx;
-  color: #fff;
-}
-
-.point-label {
-  position: absolute;
-  bottom: -40rpx;
-  font-size: 20rpx;
-  color: #666;
+.ucharts-container {
+  height: 400rpx;
+  width: 100%;
 }
 
 .action-buttons {

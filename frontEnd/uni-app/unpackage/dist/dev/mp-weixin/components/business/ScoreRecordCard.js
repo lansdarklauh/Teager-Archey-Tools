@@ -2,6 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 const utils_score = require("../../utils/score.js");
 const utils_theme = require("../../utils/theme.js");
+const utils_date = require("../../utils/date.js");
 const _sfc_main = {
   __name: "ScoreRecordCard",
   props: {
@@ -29,12 +30,16 @@ const _sfc_main = {
       return modes[mode] || mode;
     };
     const getScoreClass = (score) => {
-      if (score === "X" || score === "10")
+      if (score === "X" || score === "10" || score === "9")
         return "score-gold";
-      if (score === "9" || score === "8")
+      if (score === "8" || score === "7")
         return "score-red";
-      if (score === "7" || score === "6")
+      if (score === "6" || score === "5")
         return "score-blue";
+      if (score === "4" || score === "3")
+        return "score-black";
+      if (score === "2" || score === "1")
+        return "score-white";
       if (score === "M")
         return "score-miss";
       return "score-default";
@@ -50,7 +55,7 @@ const _sfc_main = {
     };
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: common_vendor.t(common_vendor.unref(utils_score.formatTime)(__props.record.createTime)),
+        a: common_vendor.t(common_vendor.unref(utils_date.formatTime)(__props.record.createTime)),
         b: common_vendor.t(getModeLabel(__props.record.scoreMode)),
         c: common_vendor.t(common_vendor.unref(utils_score.getBowTypeName)(__props.record.bowType)),
         d: common_vendor.t(__props.record.distance),

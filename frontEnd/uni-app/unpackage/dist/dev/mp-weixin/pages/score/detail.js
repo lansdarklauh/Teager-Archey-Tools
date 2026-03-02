@@ -3,6 +3,17 @@ const common_vendor = require("../../common/vendor.js");
 const utils_storage = require("../../utils/storage.js");
 const utils_score = require("../../utils/score.js");
 const utils_statistics = require("../../utils/statistics.js");
+const utils_constants = require("../../utils/constants.js");
+const utils_number = require("../../utils/number.js");
+const utils_date = require("../../utils/date.js");
+if (!Array) {
+  const _easycom_qiun_data_charts2 = common_vendor.resolveComponent("qiun-data-charts");
+  _easycom_qiun_data_charts2();
+}
+const _easycom_qiun_data_charts = () => "../../uni_modules/qiun-data-charts/components/qiun-data-charts/qiun-data-charts.js";
+if (!Math) {
+  _easycom_qiun_data_charts();
+}
 const _sfc_main = {
   __name: "detail",
   setup(__props) {
@@ -28,7 +39,11 @@ const _sfc_main = {
       );
     });
     const totalGroupScore = common_vendor.computed(() => {
-      return record.value.groupScoreList.reduce((sum, g) => sum + g.groupTotalScore, 0) / record.value.groupScoreList.length || 0;
+      const list = record.value.groupScoreList;
+      if (!list || list.length === 0)
+        return "0.00";
+      const sum = list.reduce((s, g) => s + (g.groupTotalScore || 0), 0);
+      return utils_number.formatDecimal2(sum / list.length);
     });
     const totalX = common_vendor.computed(() => {
       return record.value.groupScoreList.reduce(
@@ -48,19 +63,80 @@ const _sfc_main = {
     const totalArrows = common_vendor.computed(() => {
       return ringDistribution.value.reduce((sum, item) => sum + item.count, 0);
     });
-    const maxCount = common_vendor.computed(() => {
-      return Math.max(...ringDistribution.value.map((item) => item.count), 1);
+    const ringColumnChartData = common_vendor.computed(() => {
+      const dist = ringDistribution.value;
+      const categories = dist.map((d) => d.ring);
+      const data = dist.map((d) => ({
+        value: d.count,
+        color: utils_constants.RING_COLORS[d.ring] || "#999"
+      }));
+      return {
+        categories,
+        series: [{ name: "环数", data }]
+      };
     });
-    const yAxisLabels = common_vendor.computed(() => {
-      const max = maxCount.value;
-      return [
-        max,
-        Math.round(max * 0.75),
-        Math.round(max * 0.5),
-        Math.round(max * 0.25),
-        0
-      ].reverse();
+    const ringPieChartData = common_vendor.computed(() => {
+      const dist = ringDistribution.value.filter((d) => d.count > 0);
+      return {
+        categories: [],
+        series: [
+          {
+            name: "环数",
+            data: dist.map((d) => ({
+              name: d.ring,
+              value: d.count,
+              color: utils_constants.RING_COLORS[d.ring] || "#999"
+            }))
+          }
+        ]
+      };
     });
+    const groupLineChartData = common_vendor.computed(() => {
+      const groups = record.value.groupScoreList || [];
+      const categories = groups.map((_, i) => String(i + 1));
+      const data = groups.map((g) => g.groupTotalScore || 0);
+      return {
+        categories,
+        series: [{ name: "组分", data }]
+      };
+    });
+    const hasRingData = common_vendor.computed(() => totalArrows.value > 0);
+    const hasGroupData = common_vendor.computed(
+      () => record.value.groupScoreList && record.value.groupScoreList.length > 0
+    );
+    const ringColumnOpts = {
+      color: ["X", "10", "9", "8", "7", "6", "5", "4", "3", "2", "1", "M"].map(
+        (r) => utils_constants.RING_COLORS[r]
+      ),
+      padding: [15, 10, 0, 15],
+      dataLabel: true,
+      xAxis: { disableGrid: true },
+      yAxis: { gridType: "dash" },
+      extra: {
+        column: {
+          type: "group",
+          width: 20,
+          meterBorder: 1,
+          meterFillColor: "#FFFFFF"
+        }
+      }
+    };
+    const ringPieOpts = {
+      color: ["X", "10", "9", "8", "7", "6", "5", "4", "3", "2", "1", "M"].map(
+        (r) => utils_constants.RING_COLORS[r]
+      ),
+      padding: [5, 5, 5, 5],
+      dataLabel: true,
+      legend: { show: true, position: "right" }
+    };
+    const groupLineOpts = {
+      color: ["#00c853"],
+      padding: [15, 10, 0, 15],
+      dataLabel: true,
+      xAxis: { disableGrid: true },
+      yAxis: { gridType: "dash" },
+      extra: { line: { type: "curve", width: 2 } }
+    };
     const getModeLabel = (mode) => {
       const modes = { normal: "普通模式", simple: "简易模式", custom: "自定义" };
       return modes[mode] || mode;
@@ -68,43 +144,19 @@ const _sfc_main = {
     const getBowLabel = (value) => utils_score.getBowTypeName(value);
     const getTargetLabel = (value) => utils_score.getTargetTypeName(value);
     const getScoreClass = (score) => {
-      if (score === "X" || score === "10")
+      if (score === "X" || score === "10" || score === "9")
         return "score-gold";
-      if (score === "9" || score === "8")
+      if (score === "8" || score === "7")
         return "score-red";
-      if (score === "7" || score === "6")
+      if (score === "6" || score === "5")
         return "score-blue";
+      if (score === "4" || score === "3")
+        return "score-black";
+      if (score === "2" || score === "1")
+        return "score-white";
       if (score === "M")
         return "score-miss";
       return "score-default";
-    };
-    const getBarClass = (ring) => {
-      if (ring === "X" || ring === "10" || ring === "9")
-        return "bar-gold";
-      if (ring === "8" || ring === "7")
-        return "bar-red";
-      if (ring === "6" || ring === "5")
-        return "bar-blue";
-      if (ring === "M")
-        return "bar-miss";
-      return "bar-default";
-    };
-    const getBarHeight = (count) => {
-      if (count === 0)
-        return 0;
-      return Math.max(count / maxCount.value * 200, 10);
-    };
-    const getPercent = (count) => {
-      if (totalArrows.value === 0)
-        return 0;
-      return Math.round(count / totalArrows.value * 100);
-    };
-    const getPointPosition = (score) => {
-      const maxScore = Math.max(
-        ...record.value.groupScoreList.map((g) => g.groupTotalScore),
-        60
-      );
-      return score / maxScore * 150;
     };
     const onShare = () => {
       common_vendor.index.showToast({ title: "分享功能开发中", icon: "none" });
@@ -145,7 +197,7 @@ const _sfc_main = {
     return (_ctx, _cache) => {
       return common_vendor.e({
         a: common_vendor.t(record.value.totalScore),
-        b: common_vendor.t(common_vendor.unref(utils_score.formatTime)(record.value.createTime)),
+        b: common_vendor.t(common_vendor.unref(utils_date.formatTime)(record.value.createTime)),
         c: common_vendor.t(getModeLabel(record.value.scoreMode)),
         d: common_vendor.t(getBowLabel(record.value.bowType)),
         e: common_vendor.t(record.value.distance),
@@ -172,57 +224,36 @@ const _sfc_main = {
         k: common_vendor.t(record.value.totalScore),
         l: common_vendor.t(totalXTen.value),
         m: common_vendor.t(totalX.value),
-        n: record.value.scoreMode !== "custom"
-      }, record.value.scoreMode !== "custom" ? common_vendor.e({
+        n: record.value.scoreMode !== "custom" && hasRingData.value
+      }, record.value.scoreMode !== "custom" && hasRingData.value ? common_vendor.e({
         o: chartType.value === "bar" ? 1 : "",
         p: common_vendor.o(($event) => chartType.value = "bar"),
         q: chartType.value === "pie" ? 1 : "",
         r: common_vendor.o(($event) => chartType.value = "pie"),
         s: chartType.value === "bar"
       }, chartType.value === "bar" ? {
-        t: common_vendor.f(yAxisLabels.value, (y, k0, i0) => {
-          return {
-            a: common_vendor.t(y),
-            b: y
-          };
-        }),
-        v: common_vendor.f(ringDistribution.value, (item, k0, i0) => {
-          return common_vendor.e({
-            a: item.count > 0
-          }, item.count > 0 ? {
-            b: common_vendor.t(item.count)
-          } : {}, {
-            c: common_vendor.n(getBarClass(item.ring)),
-            d: getBarHeight(item.count) + "rpx",
-            e: common_vendor.t(item.ring),
-            f: item.ring
-          });
+        t: common_vendor.p({
+          type: "column",
+          chartData: ringColumnChartData.value,
+          opts: ringColumnOpts
         })
       } : {
-        w: common_vendor.f(ringDistribution.value, (item, k0, i0) => {
-          return {
-            a: common_vendor.n(getBarClass(item.ring)),
-            b: common_vendor.t(item.ring),
-            c: common_vendor.t(item.count),
-            d: common_vendor.t(getPercent(item.count)),
-            e: item.ring,
-            f: item.count > 0
-          };
+        v: common_vendor.p({
+          type: "pie",
+          chartData: ringPieChartData.value,
+          opts: ringPieOpts
         })
       }) : {}, {
-        x: record.value.scoreMode !== "custom"
-      }, record.value.scoreMode !== "custom" ? {
-        y: common_vendor.f(record.value.groupScoreList, (group, index, i0) => {
-          return {
-            a: common_vendor.t(group.groupTotalScore),
-            b: getPointPosition(group.groupTotalScore) + "rpx",
-            c: common_vendor.t(index + 1),
-            d: index
-          };
+        w: record.value.scoreMode !== "custom" && hasGroupData.value
+      }, record.value.scoreMode !== "custom" && hasGroupData.value ? {
+        x: common_vendor.p({
+          type: "line",
+          chartData: groupLineChartData.value,
+          opts: groupLineOpts
         })
       } : {}, {
-        z: common_vendor.o(onShare),
-        A: common_vendor.o(onDelete)
+        y: common_vendor.o(onShare),
+        z: common_vendor.o(onDelete)
       });
     };
   }

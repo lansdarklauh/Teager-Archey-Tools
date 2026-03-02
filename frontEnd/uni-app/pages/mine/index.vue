@@ -77,7 +77,7 @@
             class="color-preview"
             :style="{ backgroundColor: userInfo.themeColor }"
           ></view>
-          <text class="value-text">选择颜色 ></text>
+          <text class="value-text">选择颜色</text>
         </view>
       </view>
 
@@ -151,7 +151,7 @@
       <view class="setting-row">
         <text class="setting-label">自定义预设列表</text>
         <view class="setting-value" @click="goToCustomPreset">
-          <text class="value-text">选择颜色 ></text>
+          <text class="value-text">选择颜色</text>
         </view>
       </view>
     </view>
@@ -240,7 +240,7 @@ const userInfo = reactive({
   defaultBowType: "americanHuntingBow",
   defaultDistance: "30m",
   defaultTarget: "80Full",
-  defaultGroupArrow: "6组/6箭/共36箭",
+  defaultGroupArrow: "6箭/6组/共36箭",
   themeColor: "#00C853",
 });
 
@@ -269,7 +269,7 @@ const bowTypeIndex = computed(() => {
 const distanceOptions = computed(() => DISTANCES.map((d) => d.label));
 const distanceIndex = computed(() => {
   const index = DISTANCES.findIndex(
-    (d) => d.value === userInfo.defaultDistance
+    (d) => d.value === userInfo.defaultDistance,
   );
   return index > -1 ? index : 0;
 });
@@ -277,7 +277,7 @@ const distanceIndex = computed(() => {
 const targetOptions = computed(() => TARGET_TYPES.map((t) => t.label));
 const targetIndex = computed(() => {
   const index = TARGET_TYPES.findIndex(
-    (t) => t.value === userInfo.defaultTarget
+    (t) => t.value === userInfo.defaultTarget,
   );
   return index > -1 ? index : 0;
 });
@@ -285,7 +285,7 @@ const targetIndex = computed(() => {
 const groupOptions = computed(() => GROUP_ARROW_PRESETS.map((g) => g.label));
 const groupIndex = computed(() => {
   const index = GROUP_ARROW_PRESETS.findIndex(
-    (g) => g.label === userInfo.defaultGroupArrow
+    (g) => g.label === userInfo.defaultGroupArrow,
   );
   return index > -1 ? index : 0;
 });

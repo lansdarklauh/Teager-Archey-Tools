@@ -84,6 +84,10 @@ const props = defineProps({
     type: Number,
     default: 6,
   },
+  hasExistingData: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits(["confirm", "close"]);
@@ -132,12 +136,32 @@ const selectPreset = (preset) => {
 const onConfirm = () => {
   const g = parseInt(groupNum.value) || 6;
   const a = parseInt(arrowNum.value) || 6;
-  emit("confirm", {
-    groupNum: g,
-    arrowNum: a,
-    totalArrows: g * a,
-    label: `${g}组/${a}箭/共${g * a}箭`,
-  });
+
+  // 如果配置没有变化，直接关闭
+  if (g === props.defaultGroupNum && a === props.defaultArrowNum) {
+    emit("close");
+    return;
+  }
+
+  // 如果已有数据，需要提示用户
+  if (props.hasExistingData) {
+    emit("confirm", {
+      groupNum: g,
+      arrowNum: a,
+      totalArrows: g * a,
+      label: `${a}箭/${g}组/共${g * a}箭`,
+      needConfirm: true, // 标记需要二次确认
+    });
+  } else {
+    // 没有数据，直接确认
+    emit("confirm", {
+      groupNum: g,
+      arrowNum: a,
+      totalArrows: g * a,
+      label: `${a}箭/${g}组/共${g * a}箭`,
+      needConfirm: false,
+    });
+  }
 };
 
 // 关闭

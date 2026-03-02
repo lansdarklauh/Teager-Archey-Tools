@@ -75,6 +75,10 @@
   padding: 24rpx 0;
   padding-bottom: 200rpx;
   box-sizing: border-box;
+  transition: padding-bottom 0.3s ease;
+}
+.score-sections.keyboard-active.data-v-5cdcd810 {
+  padding-bottom: 650rpx;
 }
 .score-section.data-v-5cdcd810 {
   background-color: #fff;

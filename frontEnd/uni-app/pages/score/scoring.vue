@@ -175,7 +175,7 @@ import {
   calculateAccumulateScore,
   createEmptyGroupScore,
   updateGroupScoreData,
-  isAllScoresFilled,
+  getFirstUnfilledArrowIndex,
 } from "@/utils/score.js";
 import ScoreKeyboard from "@/components/common/ScoreKeyboard.vue";
 import Popup from "@/components/common/Popup.vue";
@@ -337,9 +337,14 @@ const saveCurrentGroup = () => {
 
 // 保存按钮
 const onSave = () => {
-  // 检查是否填写完整
-  if (!isAllScoresFilled(currentScores.value)) {
-    uni.showToast({ title: "请填写完整分数", icon: "none" });
+  // 检查是否填写完整，并提示具体位置
+  const unfilledIndex = getFirstUnfilledArrowIndex(currentScores.value);
+  if (unfilledIndex >= 0) {
+    uni.showToast({
+      title: `第${currentGroupIndex.value + 1}组第${unfilledIndex + 1}箭未填写`,
+      icon: "none",
+      duration: 3000,
+    });
     return;
   }
 

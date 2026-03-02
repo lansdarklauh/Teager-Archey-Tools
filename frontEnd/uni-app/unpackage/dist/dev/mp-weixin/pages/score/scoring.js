@@ -132,8 +132,13 @@ const _sfc_main = {
       });
     };
     const onSave = () => {
-      if (!utils_score.isAllScoresFilled(currentScores.value)) {
-        common_vendor.index.showToast({ title: "请填写完整分数", icon: "none" });
+      const unfilledIndex = utils_score.getFirstUnfilledArrowIndex(currentScores.value);
+      if (unfilledIndex >= 0) {
+        common_vendor.index.showToast({
+          title: `第${currentGroupIndex.value + 1}组第${unfilledIndex + 1}箭未填写`,
+          icon: "none",
+          duration: 3e3
+        });
         return;
       }
       if (record.isTakePhoto && currentPhotos.value.filter((p) => p).length === 0) {

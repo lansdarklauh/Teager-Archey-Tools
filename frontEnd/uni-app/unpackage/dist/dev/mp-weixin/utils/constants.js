@@ -26,10 +26,10 @@ const TARGET_TYPES = [
   { value: "80Ring5", label: "80cm5环", size: 80, rings: 5, isHalf: false }
 ];
 const GROUP_ARROW_PRESETS = [
-  { groupNum: 3, arrowNum: 10, label: "3组/10箭/共30箭" },
-  { groupNum: 6, arrowNum: 6, label: "6组/6箭/共36箭" },
-  { groupNum: 6, arrowNum: 10, label: "6组/10箭/共60箭" },
-  { groupNum: 6, arrowNum: 12, label: "6组/12箭/共72箭" }
+  { groupNum: 10, arrowNum: 3, label: "3箭/10组/共30箭" },
+  { groupNum: 6, arrowNum: 6, label: "6箭/6组/共36箭" },
+  { groupNum: 10, arrowNum: 6, label: "6箭/10组/共60箭" },
+  { groupNum: 12, arrowNum: 6, label: "6箭/12组/共72箭" }
 ];
 const SCORE_MODES = [
   { value: "normal", label: "普通模式", desc: "多选项" },
@@ -46,6 +46,26 @@ const TIMING_STAGES = {
   REST: "rest"
   // 休息时间
 };
+const RING_COLORS = {
+  "X": "#FFD700",
+  // 黄色
+  "10": "#FFD700",
+  "9": "#FFD700",
+  "8": "#FF0000",
+  // 红色
+  "7": "#FF0000",
+  "6": "#2196F3",
+  // 蓝色
+  "5": "#2196F3",
+  "4": "#000000",
+  // 黑色
+  "3": "#000000",
+  "2": "#FFFFFF",
+  // 白色（需黑字黑边框）
+  "1": "#FFFFFF",
+  "M": "#9E9E9E"
+  // 灰色
+};
 const THEME_COLORS = [
   { value: "#00C853", label: "绿色" },
   { value: "#2196F3", label: "蓝色" },
@@ -56,6 +76,7 @@ const THEME_COLORS = [
 exports.BOW_TYPES = BOW_TYPES;
 exports.DISTANCES = DISTANCES;
 exports.GROUP_ARROW_PRESETS = GROUP_ARROW_PRESETS;
+exports.RING_COLORS = RING_COLORS;
 exports.SCORE_MODES = SCORE_MODES;
 exports.TARGET_TYPES = TARGET_TYPES;
 exports.THEME_COLORS = THEME_COLORS;
