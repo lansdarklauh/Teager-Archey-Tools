@@ -70,14 +70,14 @@
         />
       </view>
 
-      <view class="switch-row">
+      <!-- <view class="switch-row">
         <text class="switch-label">是否照相:</text>
         <switch
           :checked="config.isTakePhoto"
           @change="onIsTakePhotoChange"
           :color="themeColor"
         />
-      </view>
+      </view> -->
 
       <view class="switch-row">
         <text class="switch-label">是否报时:</text>
@@ -207,7 +207,11 @@
 import { ref, reactive, onMounted, onUnmounted } from "vue";
 import { BOW_TYPES, DISTANCES, TARGET_TYPES } from "@/utils/constants.js";
 import { createScoreRecord } from "@/utils/score.js";
-import { addScoreRecord } from "@/utils/storage.js";
+import {
+  addScoreRecord,
+  clearScoringCache,
+  setScoringCache,
+} from "@/utils/storage.js";
 import { getThemeColor } from "@/utils/theme.js";
 import Popup from "@/components/common/Popup.vue";
 import GroupPicker from "@/components/business/GroupPicker.vue";
@@ -301,19 +305,24 @@ const onIsTimingChange = (e) => {
   config.isTiming = e.detail.value;
 };
 
-// 开始计分
+// 开始计分（非首页的“开始计分”一律清缓存重新开始；进入计分页用 reLaunch 清空堆栈）
 const startScoring = () => {
-  // 创建计分记录
+  clearScoringCache();
+  doStartScoring();
+};
+
+const doStartScoring = () => {
   const record = createScoreRecord({
     ...config,
     scoreMode: "normal",
   });
-
-  // 保存到本地
-  addScoreRecord(record);
-
-  // 跳转到计分输入页面
-  uni.navigateTo({
+  // 不加入首页列表，只写入缓存；完成计分时再 addScoreRecord，避免未保存就退出时首页出现未完成记录
+  setScoringCache({
+    scoreRecordId: record.scoreRecordId,
+    mode: "normal",
+    record: { ...record, groupScoreList: [], currentGroupIndex: 0 },
+  });
+  uni.reLaunch({
     url: `/pages/score/scoring?id=${record.scoreRecordId}&mode=normal`,
   });
 };

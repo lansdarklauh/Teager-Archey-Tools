@@ -72,19 +72,24 @@ const _sfc_main = {
     const onIs11ScoreChange = (e) => {
       config.is11Score = e.detail.value;
     };
-    const onIsTakePhotoChange = (e) => {
-      config.isTakePhoto = e.detail.value;
-    };
     const onIsTimingChange = (e) => {
       config.isTiming = e.detail.value;
     };
     const startScoring = () => {
+      utils_storage.clearScoringCache();
+      doStartScoring();
+    };
+    const doStartScoring = () => {
       const record = utils_score.createScoreRecord({
         ...config,
         scoreMode: "normal"
       });
-      utils_storage.addScoreRecord(record);
-      common_vendor.index.navigateTo({
+      utils_storage.setScoringCache({
+        scoreRecordId: record.scoreRecordId,
+        mode: "normal",
+        record: { ...record, groupScoreList: [], currentGroupIndex: 0 }
+      });
+      common_vendor.index.reLaunch({
         url: `/pages/score/scoring?id=${record.scoreRecordId}&mode=normal`
       });
     };
@@ -115,21 +120,18 @@ const _sfc_main = {
         o: config.is11Score,
         p: common_vendor.o(onIs11ScoreChange),
         q: themeColor.value,
-        r: config.isTakePhoto,
-        s: common_vendor.o(onIsTakePhotoChange),
+        r: config.isTiming,
+        s: common_vendor.o(onIsTimingChange),
         t: themeColor.value,
-        v: config.isTiming,
-        w: common_vendor.o(onIsTimingChange),
-        x: themeColor.value,
-        y: config.isTiming
+        v: config.isTiming
       }, config.isTiming ? {
-        z: config.prepareTime,
-        A: common_vendor.o(($event) => config.prepareTime = $event.detail.value),
-        B: config.formalTime,
-        C: common_vendor.o(($event) => config.formalTime = $event.detail.value)
+        w: config.prepareTime,
+        x: common_vendor.o(($event) => config.prepareTime = $event.detail.value),
+        y: config.formalTime,
+        z: common_vendor.o(($event) => config.formalTime = $event.detail.value)
       } : {}, {
-        D: common_vendor.o(startScoring),
-        E: common_vendor.f(bowTypes.value, (bow, k0, i0) => {
+        A: common_vendor.o(startScoring),
+        B: common_vendor.f(bowTypes.value, (bow, k0, i0) => {
           return {
             a: common_vendor.t(bow.label),
             b: config.bowType === bow.value ? 1 : "",
@@ -137,14 +139,14 @@ const _sfc_main = {
             d: common_vendor.o(($event) => selectBow(bow), bow.value)
           };
         }),
-        F: common_vendor.o(($event) => showBowPicker.value = $event),
-        G: common_vendor.p({
+        C: common_vendor.o(($event) => showBowPicker.value = $event),
+        D: common_vendor.p({
           title: "选择弓种",
           position: "bottom",
           showFooter: false,
           visible: showBowPicker.value
         }),
-        H: common_vendor.f(distances.value, (d, k0, i0) => {
+        E: common_vendor.f(distances.value, (d, k0, i0) => {
           return {
             a: common_vendor.t(d.label),
             b: config.distance === d.value ? 1 : "",
@@ -152,16 +154,16 @@ const _sfc_main = {
             d: common_vendor.o(($event) => selectDistance(d), d.value)
           };
         }),
-        I: customDistance.value,
-        J: common_vendor.o(($event) => customDistance.value = $event.detail.value),
-        K: common_vendor.o(onDistanceConfirm),
-        L: common_vendor.o(($event) => showDistancePicker.value = $event),
-        M: common_vendor.p({
+        F: customDistance.value,
+        G: common_vendor.o(($event) => customDistance.value = $event.detail.value),
+        H: common_vendor.o(onDistanceConfirm),
+        I: common_vendor.o(($event) => showDistancePicker.value = $event),
+        J: common_vendor.p({
           title: "选择距离",
           position: "bottom",
           visible: showDistancePicker.value
         }),
-        N: common_vendor.f(targetTypes.value, (t, k0, i0) => {
+        K: common_vendor.f(targetTypes.value, (t, k0, i0) => {
           return {
             a: common_vendor.t(t.label),
             b: config.targetType === t.value ? 1 : "",
@@ -169,28 +171,28 @@ const _sfc_main = {
             d: common_vendor.o(($event) => selectTarget(t), t.value)
           };
         }),
-        O: common_vendor.o(($event) => showTargetPicker.value = $event),
-        P: common_vendor.p({
+        L: common_vendor.o(($event) => showTargetPicker.value = $event),
+        M: common_vendor.p({
           title: "选择靶面",
           position: "bottom",
           showFooter: false,
           visible: showTargetPicker.value
         }),
-        Q: common_vendor.o(onGroupConfirm),
-        R: common_vendor.o(($event) => showGroupPicker.value = false),
-        S: common_vendor.p({
+        N: common_vendor.o(onGroupConfirm),
+        O: common_vendor.o(($event) => showGroupPicker.value = false),
+        P: common_vendor.p({
           defaultGroupNum: config.groupNum,
           defaultArrowNum: config.arrowNum
         }),
-        T: common_vendor.o(($event) => showGroupPicker.value = $event),
-        U: common_vendor.p({
+        Q: common_vendor.o(($event) => showGroupPicker.value = $event),
+        R: common_vendor.p({
           title: "",
           showHeader: false,
           showFooter: false,
           position: "center",
           visible: showGroupPicker.value
         }),
-        V: common_vendor.s(_ctx.__cssVars())
+        S: common_vendor.s(_ctx.__cssVars())
       });
     };
   }

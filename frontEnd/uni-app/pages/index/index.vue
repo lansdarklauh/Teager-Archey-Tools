@@ -1,7 +1,7 @@
 <template>
   <view class="page-container">
-    <!-- 顶部开始计分按钮 -->
-    <view class="start-btn" @click="showModeSelector = true">
+    <!-- 顶部开始计分按钮：先判断缓存并弹窗，选否再弹窗选择模式 -->
+    <view class="start-btn" @click="onStartScoringClick">
       <text>开始计分</text>
     </view>
 
@@ -120,7 +120,12 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { onShow } from "@dcloudio/uni-app";
-import { getScoreRecords } from "@/utils/storage.js";
+import {
+  getScoreRecords,
+  getScoringCache,
+  clearScoringCache,
+  deleteScoreRecord,
+} from "@/utils/storage.js";
 import { filterRecords, sortRecords } from "@/utils/statistics.js";
 import { getThemeColor } from "@/utils/theme.js";
 import Popup from "@/components/common/Popup.vue";
@@ -157,7 +162,7 @@ const filteredRecords = computed(() => {
   result = sortRecords(
     result,
     sortCondition.value.sortType,
-    sortCondition.value.sortOrder
+    sortCondition.value.sortOrder,
   );
 
   return result;
@@ -168,18 +173,53 @@ const loadRecords = () => {
   records.value = getScoreRecords();
 };
 
-// 模式选择
-const onModeSelect = (mode) => {
-  showModeSelector.value = false;
-
-  // 跳转到对应的计分配置页面
-  if (mode.value === "simple") {
-    uni.navigateTo({ url: "/pages/score/simple" });
-  } else if (mode.value === "normal") {
+// 跳转到对应模式页（不检查缓存，用于选“否”后选择模式）
+const goToModePage = (modeValue) => {
+  if (modeValue === "simple") {
+    uni.reLaunch({ url: "/pages/score/simple" });
+  } else if (modeValue === "normal") {
     uni.navigateTo({ url: "/pages/score/normal" });
-  } else if (mode.value === "custom") {
+  } else if (modeValue === "custom") {
     uni.navigateTo({ url: "/pages/score/custom" });
   }
+};
+
+// 点击首页“开始计分”按钮：先判断缓存并弹窗，选“是”继续上次，选“否”再弹窗选择模式
+const onStartScoringClick = () => {
+  const cache = getScoringCache();
+  if (cache && (cache.scoreRecordId || cache.mode === "simple")) {
+    uni.showModal({
+      title: "提示",
+      content: "检测到还有未记录完成的分数，是否继续计分？",
+      confirmText: "是",
+      cancelText: "否",
+      success: (res) => {
+        if (res.confirm) {
+          if (cache.mode === "simple") {
+            uni.reLaunch({ url: "/pages/score/simple?restore=1" });
+          } else {
+            uni.reLaunch({
+              url: `/pages/score/scoring?id=${cache.scoreRecordId}&mode=${cache.mode}`,
+            });
+          }
+        } else {
+          clearScoringCache();
+          if (cache.scoreRecordId) {
+            deleteScoreRecord(cache.scoreRecordId);
+          }
+          showModeSelector.value = true;
+        }
+      },
+    });
+    return;
+  }
+  showModeSelector.value = true;
+};
+
+// 模式选择（仅在选“否”或无缓存时才会到此，直接进入对应模式页）
+const onModeSelect = (mode) => {
+  showModeSelector.value = false;
+  goToModePage(mode.value);
 };
 
 // 点击记录

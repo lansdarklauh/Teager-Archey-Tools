@@ -286,15 +286,111 @@ export const getFirstUnfilledArrowIndex = (arrowScores) => {
 }
 
 /**
- * 获取第一个未填写分数的位置
+ * 获取第一个未填写分数的位置（仅遍历已有组，兼容旧逻辑）
  * @param {Array} groupScoreList - 组分数列表
  * @returns {{ groupIndex: number, arrowIndex: number } | null} - 第一个未填写位置，全部填写则返回null
  */
 export const getFirstUnfilledScoreLocation = (groupScoreList) => {
     for (let g = 0; g < groupScoreList.length; g++) {
-        const arrowScoreList = groupScoreList[g].arrowScoreList || []
+        const group = groupScoreList[g]
+        if (!group) continue
+        const arrowScoreList = group.arrowScoreList || []
         for (let a = 0; a < arrowScoreList.length; a++) {
             const score = arrowScoreList[a]
+            if (score === '' || score === null || score === undefined) {
+                return { groupIndex: g, arrowIndex: a }
+            }
+        }
+    }
+    return null
+}
+
+/**
+ * 获取某组的分数列表（不足用空字符串补齐）
+ * @param {Array} groupScoreList - 组分数列表
+ * @param {number} groupIndex - 组索引
+ * @param {number} arrowNum - 每组箭数
+ * @returns {Array} - 该组的分数数组
+ */
+export const getGroupScores = (groupScoreList, groupIndex, arrowNum) => {
+    const g = groupScoreList[groupIndex]
+    const list = g?.arrowScoreList
+    if (!list || !Array.isArray(list)) {
+        return new Array(arrowNum).fill('')
+    }
+    return [...list].concat(new Array(arrowNum).fill('')).slice(0, arrowNum)
+}
+
+/**
+ * 判断某组是否全部填完
+ * @param {Array} groupScoreList - 组分数列表
+ * @param {number} groupIndex - 组索引
+ * @param {number} arrowNum - 每组箭数
+ * @returns {boolean}
+ */
+export const isGroupFilled = (groupScoreList, groupIndex, arrowNum) => {
+    const scores = getGroupScores(groupScoreList, groupIndex, arrowNum)
+    return scores.every(s => s !== '' && s !== null && s !== undefined)
+}
+
+/**
+ * 按组数/箭数获取第一个未填写分数的位置
+ * @param {Array} groupScoreList - 组分数列表
+ * @param {number} groupNum - 组数
+ * @param {number} arrowNum - 每组箭数
+ * @returns {{ groupIndex: number, arrowIndex: number } | null} - 第一个未填写位置，全部填写则返回null
+ */
+export const getFirstUnfilledLocation = (groupScoreList, groupNum, arrowNum) => {
+    for (let g = 0; g < groupNum; g++) {
+        const scores = getGroupScores(groupScoreList, g, arrowNum)
+        for (let a = 0; a < arrowNum; a++) {
+            const score = scores[a]
+            if (score === '' || score === null || score === undefined) {
+                return { groupIndex: g, arrowIndex: a }
+            }
+        }
+    }
+    return null
+}
+
+/**
+ * 获取当前位之后下一个未填写的 (组, 箭) 位置（按组序、箭序）
+ * @param {Array} groupScoreList - 组分数列表
+ * @param {number} groupNum - 组数
+ * @param {number} arrowNum - 每组箭数
+ * @param {number} currentGroupIndex - 当前组索引
+ * @param {number} currentArrowIndex - 当前箭索引
+ * @returns {{ groupIndex: number, arrowIndex: number } | null}
+ */
+export const getNextUnfilledLocation = (groupScoreList, groupNum, arrowNum, currentGroupIndex, currentArrowIndex) => {
+    for (let g = 0; g < groupNum; g++) {
+        const scores = getGroupScores(groupScoreList, g, arrowNum)
+        const startA = (g === currentGroupIndex) ? currentArrowIndex + 1 : 0
+        for (let a = startA; a < arrowNum; a++) {
+            const score = scores[a]
+            if (score === '' || score === null || score === undefined) {
+                return { groupIndex: g, arrowIndex: a }
+            }
+        }
+    }
+    return null
+}
+
+/**
+ * 获取当前位之前上一个未填写的 (组, 箭) 位置
+ * @param {Array} groupScoreList - 组分数列表
+ * @param {number} groupNum - 组数
+ * @param {number} arrowNum - 每组箭数
+ * @param {number} currentGroupIndex - 当前组索引
+ * @param {number} currentArrowIndex - 当前箭索引
+ * @returns {{ groupIndex: number, arrowIndex: number } | null}
+ */
+export const getPrevUnfilledLocation = (groupScoreList, groupNum, arrowNum, currentGroupIndex, currentArrowIndex) => {
+    for (let g = currentGroupIndex; g >= 0; g--) {
+        const scores = getGroupScores(groupScoreList, g, arrowNum)
+        const endA = (g === currentGroupIndex) ? currentArrowIndex - 1 : arrowNum - 1
+        for (let a = endA; a >= 0; a--) {
+            const score = scores[a]
             if (score === '' || score === null || score === undefined) {
                 return { groupIndex: g, arrowIndex: a }
             }
@@ -323,5 +419,10 @@ export default {
     formatDate,
     isAllScoresFilled,
     getFirstUnfilledArrowIndex,
-    getFirstUnfilledScoreLocation
+    getFirstUnfilledScoreLocation,
+    getGroupScores,
+    isGroupFilled,
+    getFirstUnfilledLocation,
+    getNextUnfilledLocation,
+    getPrevUnfilledLocation
 }

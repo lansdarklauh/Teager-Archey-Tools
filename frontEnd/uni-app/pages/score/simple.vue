@@ -256,10 +256,18 @@ import {
   generateId,
   getFirstUnfilledScoreLocation,
 } from "@/utils/score.js";
-import { addScoreRecord } from "@/utils/storage.js";
+import {
+  addScoreRecord,
+  getScoringCache,
+  setScoringCache,
+  clearScoringCache,
+} from "@/utils/storage.js";
 import { getThemeColor } from "@/utils/theme.js";
 import ScoreKeyboard from "@/components/common/ScoreKeyboard.vue";
 import Popup from "@/components/common/Popup.vue";
+
+// 模块级：完成/放弃后即将 reLaunch 时置 true，避免 onUnmounted 时再次写入 scoringCache
+let skipWriteCacheOnLeave = false;
 
 // 主题色
 const themeColor = ref(getThemeColor());
@@ -680,7 +688,7 @@ const onKeyDone = () => {
   showKeyboard.value = false;
 };
 
-// 放弃计分
+// 放弃计分（清缓存并回首页）
 const onCancel = () => {
   if (hasAnyScore()) {
     uni.showModal({
@@ -688,12 +696,16 @@ const onCancel = () => {
       content: "已有计分数据，确定要放弃吗？",
       success: (res) => {
         if (res.confirm) {
-          uni.navigateBack();
+          skipWriteCacheOnLeave = true;
+          clearScoringCache();
+          uni.reLaunch({ url: "/pages/index/index" });
         }
       },
     });
   } else {
-    uni.navigateBack();
+    skipWriteCacheOnLeave = true;
+    clearScoringCache();
+    uni.reLaunch({ url: "/pages/index/index" });
   }
 };
 
@@ -786,18 +798,84 @@ const doComplete = () => {
 
   // 保存记录
   addScoreRecord(record);
+  skipWriteCacheOnLeave = true;
+  clearScoringCache();
 
   showCompleteConfirm.value = false;
   uni.showToast({ title: "计分完成", icon: "success" });
 
   setTimeout(() => {
-    uni.navigateBack();
+    uni.reLaunch({ url: "/pages/index/index" });
     uni.$emit("refreshScoreList");
   }, 1500);
 };
 
+// 仅当从首页“继续计分”进入（带 restore=1）时从缓存恢复，否则重新开始
+const tryRestoreFromCache = () => {
+  const pages = getCurrentPages();
+  const page = pages[pages.length - 1];
+  const options = page.$page?.options || page.options || {};
+  if (!options.restore) {
+    initGroups();
+    return;
+  }
+  const cache = getScoringCache();
+  if (!cache || cache.mode !== "simple") {
+    initGroups();
+    return;
+  }
+  initGroups(); // 先有一组占位，避免弹窗时页面空白
+  uni.showModal({
+    title: "提示",
+    content: "检测到还有未记录完成的分数，是否继续计分？",
+    confirmText: "是",
+    cancelText: "否",
+    success: (res) => {
+      if (res.confirm && cache.config && Array.isArray(cache.groupScoreList)) {
+        Object.assign(config, cache.config);
+        groupScoreList.value = cache.groupScoreList.map((g, i) => ({
+          ...g,
+          id: g.id || "group_" + (i + 1),
+        }));
+        groupIdCounter = groupScoreList.value.length;
+        recalculateAllScores();
+        const unfilled = getFirstUnfilledScoreLocation(groupScoreList.value);
+        if (unfilled) {
+          activeGroup.value = unfilled.groupIndex;
+          activeIndex.value = unfilled.arrowIndex;
+          nextTick(() => {
+            scrollToView.value = "group-" + unfilled.groupIndex;
+          });
+        }
+      } else {
+        clearScoringCache();
+        initGroups();
+      }
+    },
+  });
+};
+
+// 有分数时写入计分缓存（不加入首页列表）
+const writeScoringCache = () => {
+  if (skipWriteCacheOnLeave || !hasAnyScore()) return;
+  setScoringCache({
+    mode: "simple",
+    config: { ...config },
+    groupScoreList: JSON.parse(JSON.stringify(groupScoreList.value)),
+  });
+};
+
+watch(
+  () => [...groupScoreList.value],
+  () => {
+    writeScoringCache();
+  },
+  { deep: true }
+);
+
 onMounted(() => {
-  initGroups();
+  skipWriteCacheOnLeave = false; // 每次进入计分页重置
+  tryRestoreFromCache();
   // 监听主题色变化
   uni.$on("themeColorChange", (color) => {
     themeColor.value = color;
@@ -805,8 +883,18 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+  writeScoringCache();
   uni.$off("themeColorChange");
 });
+</script>
+
+<script>
+export default {
+  onBackPress() {
+    uni.reLaunch({ url: "/pages/index/index" });
+    return true;
+  },
+};
 </script>
 
 <style lang="scss" scoped>

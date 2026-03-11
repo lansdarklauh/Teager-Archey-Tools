@@ -55,6 +55,9 @@
 }
 .record-info.data-v-962cd50f {
   flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 60rpx;
 }
 .info-row.data-v-962cd50f {
   display: flex;
@@ -77,6 +80,7 @@
   flex-direction: column;
   align-items: flex-end;
   justify-content: center;
+  margin-left: 40rpx;
 }
 .score-label.data-v-962cd50f {
   font-size: 24rpx;

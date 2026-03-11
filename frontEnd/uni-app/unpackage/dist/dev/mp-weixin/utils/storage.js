@@ -3,6 +3,8 @@ const common_vendor = require("../common/vendor.js");
 const STORAGE_KEYS = {
   SCORE_RECORDS: "scoreRecords",
   // 计分记录
+  SCORING_CACHE: "scoringCache",
+  // 计分中临时缓存（不加入计分列表）
   BASE_CONFIG: "baseConfig",
   // 基础配置
   TIMING_PRESET: "timingPreset",
@@ -19,7 +21,7 @@ const setItem = (key, value) => {
       common_vendor.index.setStorageSync(key, data);
       resolve(true);
     } catch (e) {
-      common_vendor.index.__f__("error", "at utils/storage.js:28", "存储数据失败:", e);
+      common_vendor.index.__f__("error", "at utils/storage.js:29", "存储数据失败:", e);
       reject(e);
     }
   });
@@ -32,9 +34,20 @@ const getItem = (key, defaultValue = null) => {
     }
     return defaultValue;
   } catch (e) {
-    common_vendor.index.__f__("error", "at utils/storage.js:48", "获取数据失败:", e);
+    common_vendor.index.__f__("error", "at utils/storage.js:49", "获取数据失败:", e);
     return defaultValue;
   }
+};
+const removeItem = (key) => {
+  return new Promise((resolve, reject) => {
+    try {
+      common_vendor.index.removeStorageSync(key);
+      resolve(true);
+    } catch (e) {
+      common_vendor.index.__f__("error", "at utils/storage.js:85", "删除数据失败:", e);
+      reject(e);
+    }
+  });
 };
 const getScoreRecords = () => {
   return getItem(STORAGE_KEYS.SCORE_RECORDS, []);
@@ -61,6 +74,16 @@ const deleteScoreRecord = (recordId) => {
 const getScoreRecordById = (recordId) => {
   const records = getScoreRecords();
   return records.find((r) => r.scoreRecordId === recordId) || null;
+};
+const getScoringCache = () => {
+  return getItem(STORAGE_KEYS.SCORING_CACHE, null);
+};
+const setScoringCache = (data) => {
+  const payload = { ...data, updateTime: Date.now() };
+  return setItem(STORAGE_KEYS.SCORING_CACHE, payload);
+};
+const clearScoringCache = () => {
+  return removeItem(STORAGE_KEYS.SCORING_CACHE);
 };
 const getCustomPresets = () => {
   return getItem(STORAGE_KEYS.CUSTOM_PRESET, []);
@@ -112,13 +135,16 @@ const updateUserInfo = (info) => {
 };
 exports.addCustomPreset = addCustomPreset;
 exports.addScoreRecord = addScoreRecord;
+exports.clearScoringCache = clearScoringCache;
 exports.deleteCustomPreset = deleteCustomPreset;
 exports.deleteScoreRecord = deleteScoreRecord;
 exports.getCustomPresets = getCustomPresets;
 exports.getScoreRecordById = getScoreRecordById;
 exports.getScoreRecords = getScoreRecords;
+exports.getScoringCache = getScoringCache;
 exports.getTimingPresets = getTimingPresets;
 exports.getUserInfo = getUserInfo;
+exports.setScoringCache = setScoringCache;
 exports.updateScoreRecord = updateScoreRecord;
 exports.updateUserInfo = updateUserInfo;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/utils/storage.js.map

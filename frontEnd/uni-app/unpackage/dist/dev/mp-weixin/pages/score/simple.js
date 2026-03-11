@@ -9,7 +9,13 @@ if (!Math) {
 }
 const ScoreKeyboard = () => "../../components/common/ScoreKeyboard.js";
 const Popup = () => "../../components/common/Popup.js";
-const _sfc_main = {
+const __default__ = {
+  onBackPress() {
+    common_vendor.index.reLaunch({ url: "/pages/index/index" });
+    return true;
+  }
+};
+const _sfc_main = /* @__PURE__ */ Object.assign(__default__, {
   __name: "simple",
   setup(__props) {
     common_vendor.useCssVars((_ctx) => ({
@@ -18,6 +24,7 @@ const _sfc_main = {
       "4d5eab7d": currentThemeColor.value,
       "174509f6": themeColor.value + "33"
     }));
+    let skipWriteCacheOnLeave = false;
     const themeColor = common_vendor.ref(utils_theme.getThemeColor());
     const currentThemeColor = common_vendor.computed(() => themeColor.value);
     const config = common_vendor.reactive({
@@ -334,12 +341,16 @@ const _sfc_main = {
           content: "已有计分数据，确定要放弃吗？",
           success: (res) => {
             if (res.confirm) {
-              common_vendor.index.navigateBack();
+              skipWriteCacheOnLeave = true;
+              utils_storage.clearScoringCache();
+              common_vendor.index.reLaunch({ url: "/pages/index/index" });
             }
           }
         });
       } else {
-        common_vendor.index.navigateBack();
+        skipWriteCacheOnLeave = true;
+        utils_storage.clearScoringCache();
+        common_vendor.index.reLaunch({ url: "/pages/index/index" });
       }
     };
     const onSaveClick = () => {
@@ -409,20 +420,84 @@ const _sfc_main = {
         isCompleted: true
       };
       utils_storage.addScoreRecord(record);
+      skipWriteCacheOnLeave = true;
+      utils_storage.clearScoringCache();
       showCompleteConfirm.value = false;
       common_vendor.index.showToast({ title: "计分完成", icon: "success" });
       setTimeout(() => {
-        common_vendor.index.navigateBack();
+        common_vendor.index.reLaunch({ url: "/pages/index/index" });
         common_vendor.index.$emit("refreshScoreList");
       }, 1500);
     };
-    common_vendor.onMounted(() => {
+    const tryRestoreFromCache = () => {
+      var _a;
+      const pages = getCurrentPages();
+      const page = pages[pages.length - 1];
+      const options = ((_a = page.$page) == null ? void 0 : _a.options) || page.options || {};
+      if (!options.restore) {
+        initGroups();
+        return;
+      }
+      const cache = utils_storage.getScoringCache();
+      if (!cache || cache.mode !== "simple") {
+        initGroups();
+        return;
+      }
       initGroups();
+      common_vendor.index.showModal({
+        title: "提示",
+        content: "检测到还有未记录完成的分数，是否继续计分？",
+        confirmText: "是",
+        cancelText: "否",
+        success: (res) => {
+          if (res.confirm && cache.config && Array.isArray(cache.groupScoreList)) {
+            Object.assign(config, cache.config);
+            groupScoreList.value = cache.groupScoreList.map((g, i) => ({
+              ...g,
+              id: g.id || "group_" + (i + 1)
+            }));
+            groupIdCounter = groupScoreList.value.length;
+            recalculateAllScores();
+            const unfilled = utils_score.getFirstUnfilledScoreLocation(groupScoreList.value);
+            if (unfilled) {
+              activeGroup.value = unfilled.groupIndex;
+              activeIndex.value = unfilled.arrowIndex;
+              common_vendor.nextTick$1(() => {
+                scrollToView.value = "group-" + unfilled.groupIndex;
+              });
+            }
+          } else {
+            utils_storage.clearScoringCache();
+            initGroups();
+          }
+        }
+      });
+    };
+    const writeScoringCache = () => {
+      if (skipWriteCacheOnLeave || !hasAnyScore())
+        return;
+      utils_storage.setScoringCache({
+        mode: "simple",
+        config: { ...config },
+        groupScoreList: JSON.parse(JSON.stringify(groupScoreList.value))
+      });
+    };
+    common_vendor.watch(
+      () => [...groupScoreList.value],
+      () => {
+        writeScoringCache();
+      },
+      { deep: true }
+    );
+    common_vendor.onMounted(() => {
+      skipWriteCacheOnLeave = false;
+      tryRestoreFromCache();
       common_vendor.index.$on("themeColorChange", (color) => {
         themeColor.value = color;
       });
     });
     common_vendor.onUnmounted(() => {
+      writeScoringCache();
       common_vendor.index.$off("themeColorChange");
     });
     return (_ctx, _cache) => {
@@ -560,7 +635,7 @@ const _sfc_main = {
       };
     };
   }
-};
+});
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-5cdcd810"]]);
 wx.createPage(MiniProgramPage);
 //# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/score/simple.js.map

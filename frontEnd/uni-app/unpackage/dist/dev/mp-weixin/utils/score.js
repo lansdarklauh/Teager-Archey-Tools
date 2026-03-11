@@ -134,9 +134,36 @@ const getFirstUnfilledArrowIndex = (arrowScores) => {
 };
 const getFirstUnfilledScoreLocation = (groupScoreList) => {
   for (let g = 0; g < groupScoreList.length; g++) {
-    const arrowScoreList = groupScoreList[g].arrowScoreList || [];
+    const group = groupScoreList[g];
+    if (!group)
+      continue;
+    const arrowScoreList = group.arrowScoreList || [];
     for (let a = 0; a < arrowScoreList.length; a++) {
       const score = arrowScoreList[a];
+      if (score === "" || score === null || score === void 0) {
+        return { groupIndex: g, arrowIndex: a };
+      }
+    }
+  }
+  return null;
+};
+const getGroupScores = (groupScoreList, groupIndex, arrowNum) => {
+  const g = groupScoreList[groupIndex];
+  const list = g == null ? void 0 : g.arrowScoreList;
+  if (!list || !Array.isArray(list)) {
+    return new Array(arrowNum).fill("");
+  }
+  return [...list].concat(new Array(arrowNum).fill("")).slice(0, arrowNum);
+};
+const isGroupFilled = (groupScoreList, groupIndex, arrowNum) => {
+  const scores = getGroupScores(groupScoreList, groupIndex, arrowNum);
+  return scores.every((s) => s !== "" && s !== null && s !== void 0);
+};
+const getFirstUnfilledLocation = (groupScoreList, groupNum, arrowNum) => {
+  for (let g = 0; g < groupNum; g++) {
+    const scores = getGroupScores(groupScoreList, g, arrowNum);
+    for (let a = 0; a < arrowNum; a++) {
+      const score = scores[a];
       if (score === "" || score === null || score === void 0) {
         return { groupIndex: g, arrowIndex: a };
       }
@@ -151,7 +178,10 @@ exports.createScoreRecord = createScoreRecord;
 exports.generateId = generateId;
 exports.getBowTypeName = getBowTypeName;
 exports.getFirstUnfilledArrowIndex = getFirstUnfilledArrowIndex;
+exports.getFirstUnfilledLocation = getFirstUnfilledLocation;
 exports.getFirstUnfilledScoreLocation = getFirstUnfilledScoreLocation;
+exports.getGroupScores = getGroupScores;
 exports.getTargetTypeName = getTargetTypeName;
+exports.isGroupFilled = isGroupFilled;
 exports.updateGroupScoreData = updateGroupScoreData;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/utils/score.js.map

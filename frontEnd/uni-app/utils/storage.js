@@ -6,6 +6,7 @@
 // 存储 key 常量
 export const STORAGE_KEYS = {
     SCORE_RECORDS: 'scoreRecords',      // 计分记录
+    SCORING_CACHE: 'scoringCache',      // 计分中临时缓存（不加入计分列表）
     BASE_CONFIG: 'baseConfig',          // 基础配置
     TIMING_PRESET: 'timingPreset',      // 计时预设
     CUSTOM_PRESET: 'customPreset',      // 自定义模式预设
@@ -161,6 +162,32 @@ export const getScoreRecordById = (recordId) => {
     return records.find(r => r.scoreRecordId === recordId) || null
 }
 
+// =============== 计分中缓存（临时，不加入计分列表） ===============
+
+/**
+ * 获取计分中缓存
+ * @returns {object|null} - { scoreRecordId?, mode, record?, config?, groupScoreList?, currentGroupIndex?, updateTime } 或 null
+ */
+export const getScoringCache = () => {
+    return getItem(STORAGE_KEYS.SCORING_CACHE, null)
+}
+
+/**
+ * 设置计分中缓存
+ * @param {object} data - 缓存数据
+ */
+export const setScoringCache = (data) => {
+    const payload = { ...data, updateTime: Date.now() }
+    return setItem(STORAGE_KEYS.SCORING_CACHE, payload)
+}
+
+/**
+ * 清空计分中缓存
+ */
+export const clearScoringCache = () => {
+    return removeItem(STORAGE_KEYS.SCORING_CACHE)
+}
+
 // =============== 自定义预设专用方法 ===============
 
 /**
@@ -301,6 +328,9 @@ export default {
     updateScoreRecord,
     deleteScoreRecord,
     getScoreRecordById,
+    getScoringCache,
+    setScoringCache,
+    clearScoringCache,
     getCustomPresets,
     addCustomPreset,
     deleteCustomPreset,

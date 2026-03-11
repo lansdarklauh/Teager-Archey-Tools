@@ -137,6 +137,10 @@ const _sfc_main = {
       });
     };
     const startScoring = () => {
+      utils_storage.clearScoringCache();
+      doStartScoring();
+    };
+    const doStartScoring = () => {
       const customTargetList = isMultiTarget.value ? targetList.value.map((t, i) => ({
         targetIndex: i + 1,
         targetArrowNum: t.arrowNum,
@@ -171,8 +175,12 @@ const _sfc_main = {
         isCompleted: false,
         currentGroupIndex: 0
       };
-      utils_storage.addScoreRecord(record);
-      common_vendor.index.navigateTo({
+      utils_storage.setScoringCache({
+        scoreRecordId: record.scoreRecordId,
+        mode: "custom",
+        record: { ...record, groupScoreList: [], currentGroupIndex: 0 }
+      });
+      common_vendor.index.reLaunch({
         url: `/pages/score/scoring?id=${record.scoreRecordId}&mode=custom`
       });
     };

@@ -43,15 +43,48 @@ const _sfc_main = {
     const loadRecords = () => {
       records.value = utils_storage.getScoreRecords();
     };
-    const onModeSelect = (mode) => {
-      showModeSelector.value = false;
-      if (mode.value === "simple") {
-        common_vendor.index.navigateTo({ url: "/pages/score/simple" });
-      } else if (mode.value === "normal") {
+    const goToModePage = (modeValue) => {
+      if (modeValue === "simple") {
+        common_vendor.index.reLaunch({ url: "/pages/score/simple" });
+      } else if (modeValue === "normal") {
         common_vendor.index.navigateTo({ url: "/pages/score/normal" });
-      } else if (mode.value === "custom") {
+      } else if (modeValue === "custom") {
         common_vendor.index.navigateTo({ url: "/pages/score/custom" });
       }
+    };
+    const onStartScoringClick = () => {
+      const cache = utils_storage.getScoringCache();
+      if (cache && (cache.scoreRecordId || cache.mode === "simple")) {
+        common_vendor.index.showModal({
+          title: "提示",
+          content: "检测到还有未记录完成的分数，是否继续计分？",
+          confirmText: "是",
+          cancelText: "否",
+          success: (res) => {
+            if (res.confirm) {
+              if (cache.mode === "simple") {
+                common_vendor.index.reLaunch({ url: "/pages/score/simple?restore=1" });
+              } else {
+                common_vendor.index.reLaunch({
+                  url: `/pages/score/scoring?id=${cache.scoreRecordId}&mode=${cache.mode}`
+                });
+              }
+            } else {
+              utils_storage.clearScoringCache();
+              if (cache.scoreRecordId) {
+                utils_storage.deleteScoreRecord(cache.scoreRecordId);
+              }
+              showModeSelector.value = true;
+            }
+          }
+        });
+        return;
+      }
+      showModeSelector.value = true;
+    };
+    const onModeSelect = (mode) => {
+      showModeSelector.value = false;
+      goToModePage(mode.value);
     };
     const onRecordClick = (record) => {
     };
@@ -84,7 +117,7 @@ const _sfc_main = {
     });
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: common_vendor.o(($event) => showModeSelector.value = true),
+        a: common_vendor.o(onStartScoringClick),
         b: common_vendor.o(($event) => showFilterPanel.value = true),
         c: common_vendor.o(($event) => showSortPanel.value = true),
         d: records.value.length > 0

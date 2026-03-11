@@ -302,6 +302,8 @@ import {
   addCustomPreset,
   deleteCustomPreset,
   addScoreRecord,
+  clearScoringCache,
+  setScoringCache,
 } from "@/utils/storage.js";
 import { getThemeColor } from "@/utils/theme.js";
 import Popup from "@/components/common/Popup.vue";
@@ -460,8 +462,13 @@ const deletePreset = (presetId) => {
   });
 };
 
-// 开始计分
+// 开始计分（非首页的“开始计分”一律清缓存重新开始；进入计分页用 reLaunch 清空堆栈）
 const startScoring = () => {
+  clearScoringCache();
+  doStartScoring();
+};
+
+const doStartScoring = () => {
   const customTargetList = isMultiTarget.value
     ? targetList.value.map((t, i) => ({
         targetIndex: i + 1,
@@ -506,9 +513,14 @@ const startScoring = () => {
     currentGroupIndex: 0,
   };
 
-  addScoreRecord(record);
+  // 不加入首页列表，只写入缓存；完成计分时再 addScoreRecord
+  setScoringCache({
+    scoreRecordId: record.scoreRecordId,
+    mode: "custom",
+    record: { ...record, groupScoreList: [], currentGroupIndex: 0 },
+  });
 
-  uni.navigateTo({
+  uni.reLaunch({
     url: `/pages/score/scoring?id=${record.scoreRecordId}&mode=custom`,
   });
 };

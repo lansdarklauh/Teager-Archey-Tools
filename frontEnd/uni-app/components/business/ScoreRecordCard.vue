@@ -169,6 +169,9 @@ const onDetailClick = () => {
 
 .record-info {
   flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 60rpx;
 }
 
 .info-row {
@@ -196,6 +199,7 @@ const onDetailClick = () => {
   flex-direction: column;
   align-items: flex-end;
   justify-content: center;
+  margin-left: 40rpx;
 }
 
 .score-label {
